@@ -1,0 +1,14 @@
+http://www.thepaper.cn/index_masonry.jsp?topCids=1495258,&_=1467902491392
+http://www.thepaper.cn/index_masonry.jsp?topCids=1495258,&_=1467904799637
+http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1495258,1494171,1495064,1495259,1495130,&pageidx=2&lastTime=1467891116598
+http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1495258,1494171,1495064,1495130,1495285,&pageidx=2&lastTime=1467893376408
+1467893376408
+ pathParse: function(path,pageidx){        
+            return function(pageidx){
+                var lastTime = $('#last' + masonry_pageidx).attr("lastTime");
+                masonry_pageidx = parseInt($('#last' + masonry_pageidx).attr("pageIndex"));
+                masonry_pageidx = masonry_pageidx + 1;
+                return "load_chosen.jsp?nodeids=25949&topCids=1495258,1494171,1495064,1495259,1495130
+,&pageidx=" + masonry_pageidx + "&lastTime=" + lastTime;
+            }
+        }

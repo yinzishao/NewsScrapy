@@ -1,0 +1,17 @@
+scrapy startproject peojectname
+
+apt-get install Python-bs4
+
+from bs4 import BeautifulSoup
+
+scrapy crawl thepaper | more
+
+from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+-------------------------------------------------
+#BeautifulSoup
+
+sopu.find(name="tag", attrs={"attr1": True});
+
+soup.select('div[class="news_li"]')
+
+.has_attr("lasttime")

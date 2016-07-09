@@ -1,0 +1,40 @@
+2016-07-09 22:46:27 [scrapy] INFO: Scrapy 1.0.4 started (bot: thepaper)
+2016-07-09 22:46:27 [scrapy] INFO: Optional features available: ssl, http11
+2016-07-09 22:46:27 [scrapy] INFO: Overridden settings: {'NEWSPIDER_MODULE': 'thepaper.spiders', 'SPIDER_MODULES': ['thepaper.spiders'], 'LOG_FILE': 'thepaper_log', 'BOT_NAME': 'thepaper'}
+2016-07-09 22:46:27 [scrapy] INFO: Enabled extensions: CloseSpider, TelnetConsole, LogStats, CoreStats, SpiderState
+2016-07-09 22:46:27 [scrapy] INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, RotateUserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+2016-07-09 22:46:27 [scrapy] INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+2016-07-09 22:46:27 [scrapy] INFO: Enabled item pipelines: 
+2016-07-09 22:46:27 [scrapy] INFO: Spider opened
+2016-07-09 22:46:27 [scrapy] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2016-07-09 22:46:27 [scrapy] DEBUG: Telnet console listening on 127.0.0.1:6023
+2016-07-09 22:46:27 [USerAgent] INFO: Current UserAgent:Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3
+2016-07-09 22:46:27 [scrapy] DEBUG: Crawled (200) <GET http://www.thepaper.cn/index_masonry.jsp> (referer: None)
+2016-07-09 22:46:28 [USerAgent] INFO: Current UserAgent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6
+2016-07-09 22:46:28 [scrapy] DEBUG: Crawled (200) <GET http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1494171,1496198,1496167,1496199,&pageidx=2&lastTime=1468063646705> (referer: http://www.thepaper.cn/index_masonry.jsp)
+2016-07-09 22:46:28 [USerAgent] INFO: Current UserAgent:Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3
+2016-07-09 22:46:28 [scrapy] DEBUG: Crawled (200) <GET http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1494171,1496198,1496167,1496199,&pageidx=3&lastTime=1468055237832> (referer: http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1494171,1496198,1496167,1496199,&pageidx=2&lastTime=1468063646705)
+2016-07-09 22:46:28 [USerAgent] INFO: Current UserAgent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3
+2016-07-09 22:46:28 [scrapy] DEBUG: Crawled (200) <GET http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1494171,1496198,1496167,1496199,&pageidx=4&lastTime=1468044902862> (referer: http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1494171,1496198,1496167,1496199,&pageidx=3&lastTime=1468055237832)
+2016-07-09 22:46:29 [USerAgent] INFO: Current UserAgent:Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6
+2016-07-09 22:46:29 [scrapy] DEBUG: Crawled (200) <GET http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1494171,1496198,1496167,1496199,&pageidx=5&lastTime=1468034516173> (referer: http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1494171,1496198,1496167,1496199,&pageidx=4&lastTime=1468044902862)
+2016-07-09 22:46:29 [scrapy] INFO: Closing spider (finished)
+2016-07-09 22:46:29 [scrapy] INFO: Dumping Scrapy stats:
+{'downloader/request_bytes': 2955,
+ 'downloader/request_count': 5,
+ 'downloader/request_method_count/GET': 5,
+ 'downloader/response_bytes': 29005,
+ 'downloader/response_count': 5,
+ 'downloader/response_status_count/200': 5,
+ 'finish_reason': 'finished',
+ 'finish_time': datetime.datetime(2016, 7, 9, 14, 46, 29, 479077),
+ 'log_count/DEBUG': 6,
+ 'log_count/INFO': 12,
+ 'request_depth_max': 4,
+ 'response_received_count': 5,
+ 'scheduler/dequeued': 5,
+ 'scheduler/dequeued/memory': 5,
+ 'scheduler/enqueued': 5,
+ 'scheduler/enqueued/memory': 5,
+ 'start_time': datetime.datetime(2016, 7, 9, 14, 46, 27, 662433)}
+2016-07-09 22:46:29 [scrapy] INFO: Spider closed (finished)

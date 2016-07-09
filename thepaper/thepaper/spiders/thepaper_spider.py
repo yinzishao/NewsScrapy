@@ -6,6 +6,8 @@ import scrapy
 from bs4 import BeautifulSoup
 import re
 from thepaper.items import NewsItem
+
+
 class ThepaperSpider(scrapy.spiders.Spider):
     domain = "http://www.thepaper.cn"
     name = "thepaper"
@@ -19,9 +21,11 @@ class ThepaperSpider(scrapy.spiders.Spider):
         #首页内容
         html = response.body
         soup = BeautifulSoup(html,"lxml")
-        for i in self.fetch_newslist(soup):
-            yield i
-        item = NewsItem()
+        #爬取首页新闻列表
+        # for i in self.fetch_newslist(soup):
+        #     yield i
+
+        #爬取下一页的链接
         lasttime = "nothing"
         for i in  soup.select('div[class="news_li"]'):
             if i.attrs.has_key("lasttime"):
@@ -35,17 +39,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
         if load_chosen :
             tp_url = "http://www.thepaper.cn/load_chosen.jsp?%s%s&lastTime=%s" % (load_chosen.group(1),page,lasttime)
             yield scrapy.Request(tp_url, callback=self.next_page_parse)
-        # news_list = soup.select('div[class="news_li"]')
-        # for news in news_list:
-        #     item["title"] = news.h2.a.string    #题目
-        #     item["news_url"] = news.h2.a.get("href") #新闻链接
-        #     item["content"] = news.p.string     #简介
-        #     item["pic"] = news.img.get("src")   #图片链接
-        #     topic = news.select('div[class="pdtt_trbs"]')
-        #     if topic:
-        #         item["topic"] = topic[0].a.string  #专题
-        #         item["time"]=topic[0].span.string  #对比爬取时间的时间
-        #     yield item
+
 
 
     def next_page_parse(self,response):
@@ -66,28 +60,15 @@ class ThepaperSpider(scrapy.spiders.Spider):
                     yield scrapy.Request(new_url, callback=self.next_page_parse)
             # else:
                 #log.msg("can't find lasttime or pageindex", level=log.INFO)
-        #爬取新闻列表
 
-        # #爬取新闻链接
-        # news_list = np_soup.select('div[class="news_li"]')
-        # for news in news_list:
-        #     item = NewsItem()
-        #     item["title"] = news.h2.a.string    #题目
-        #     item["news_url"] = news.h2.a.get("href") #新闻链接
-        #     item["content"] = news.p.string     #简介
-        #     item["pic"] = news.img.get("src")   #图片链接
-        #     topic = news.select('div[class="pdtt_trbs"]')
-        #     if topic:
-        #         item["topic"] = topic[0].a.string  #专题
-        #         item["time"]=topic[0].span.string  #对比爬取时间的时间
-        for i in self.fetch_newslist(np_soup):yield i
+        # for i in self.fetch_newslist(np_soup):yield i
 
     def fetch_newslist(self,soup):
         #爬取新闻链接
         news_list = soup.select('div[class="news_li"]')
         res=[]
         for news in news_list:
-            if news.has_attr("lasttime"):break
+            if news.has_attr("lasttime"):break  #首页出现的特殊异常
             item = NewsItem()
             item["title"] = news.h2.a.string    #题目
             item["news_url"] = news.h2.a.get("href") #新闻链接
