@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .idea/
+NewsScrapy/thepaper/log/
 # C extensions
 *.so
 

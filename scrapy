@@ -218,9 +218,15 @@ def request_seen(self, request):
 
 去重是把request 的fingerprint存在redis上来实现的吧？那大规模抓取不就很耗费内存？每条没读过的链接都存。
 有没有人试过用bloomfilter结合scrapy—redis来去重。有没有必要？
+---------------------------------------------------------------------------------------------
 
+问题：
 
+tag.select('div[class="不能有空格"]') 如何解决？
 
+是否在 pipeline中去掉/r/n?
+
+list [] 是否 传进数据库是什么？
 
 
 

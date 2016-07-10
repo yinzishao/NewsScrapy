@@ -7,6 +7,19 @@ from bs4 import BeautifulSoup
 scrapy crawl thepaper | more
 
 from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+
+import logging
+logger = logging.getLogger('USerAgent')
+logger.info("msg")
+
+request = scrapy.Request("http://www.example.com/some_page.html",
+                             callback=self.parse_page2)
+
+scrapy crawl meadin -o meadin.json
+
+scrapy crawl meadin -o log/meadin.json --logfile log/meadin.log
+
+
 -------------------------------------------------
 #BeautifulSoup
 
@@ -15,3 +28,13 @@ sopu.find(name="tag", attrs={"attr1": True});
 soup.select('div[class="news_li"]')
 
 .has_attr("lasttime")
+
+
+-------------------------------------------------
+#re
+
+re.search(pattern, string, flags)
+
+re.sub(pattern, repl, string, count)
+
+re.split(r'\s+', text)；

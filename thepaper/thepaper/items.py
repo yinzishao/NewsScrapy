@@ -20,3 +20,4 @@ class NewsItem(scrapy.Item):
     pic = scrapy.Field()
     topic = scrapy.Field()
     time = scrapy.Field()
+    tags = scrapy.Field()
