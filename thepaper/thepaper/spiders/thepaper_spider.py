@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from scrapy.exceptions import CloseSpider
+
 __author__ = 'yinzishao'
 
 import scrapy
@@ -9,7 +11,7 @@ from thepaper.items import NewsItem
 
 
 class ThepaperSpider(scrapy.spiders.Spider):
-    domain = "http://www.thepaper.cn"
+    domain = "http://www.thepaper.cn/"
     name = "thepaper"
     allowed_domains = ["thepaper.cn"]
     start_urls = [
@@ -22,8 +24,10 @@ class ThepaperSpider(scrapy.spiders.Spider):
         html = response.body
         soup = BeautifulSoup(html,"lxml")
         #爬取首页新闻列表
-        # for i in self.fetch_newslist(soup):
-        #     yield i
+        for i in self.fetch_newslist(soup):
+            # raise CloseSpider(str(i['time'] == u"一天前"))
+            if i['time'] == "一天前": raise CloseSpider("today news end")
+            yield i
 
         #爬取下一页的链接
         lasttime = "nothing"
@@ -54,14 +58,16 @@ class ThepaperSpider(scrapy.spiders.Spider):
 
             if lasttime and pageindex:
                 #终止条件，需更改，暂定前5页
-                if int(pageindex) <5:
+                # if int(pageindex) <8:
                     pageindex = str(int(pageindex)+1)
                     new_url = re.sub(r'pageidx=.*?&lastTime=.*',"pageidx=%s&lastTime=%s" % (pageindex,lasttime),url,1)
                     yield scrapy.Request(new_url, callback=self.next_page_parse)
             # else:
                 #log.msg("can't find lasttime or pageindex", level=log.INFO)
 
-        # for i in self.fetch_newslist(np_soup):yield i
+        for i in self.fetch_newslist(np_soup):
+            if i['time'] == u"1天前": raise CloseSpider("today news end")
+            yield i
 
     def fetch_newslist(self,soup):
         #爬取新闻链接
@@ -71,7 +77,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
             if news.has_attr("lasttime"):break  #首页出现的特殊异常
             item = NewsItem()
             item["title"] = news.h2.a.string    #题目
-            item["news_url"] = news.h2.a.get("href") #新闻链接
+            item["news_url"] = self.domain+news.h2.a.get("href") #新闻链接
             item["content"] = news.p.string     #简介
             item["pic"] = news.img.get("src")   #图片链接
             topic = news.select('div[class="pdtt_trbs"]')
