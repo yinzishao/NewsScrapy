@@ -38,3 +38,7 @@ re.search(pattern, string, flags)
 re.sub(pattern, repl, string, count)
 
 re.split(r'\s+', text)；
+
+
+------------------------------------------------
+time.strptime(date,"%Y-%m-%d")
