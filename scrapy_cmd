@@ -41,4 +41,11 @@ re.split(r'\s+', text)；
 
 
 ------------------------------------------------
+#time,datetime
 time.strptime(date,"%Y-%m-%d")
+
+datetime.datetime.combine(datetime.date.today(), datetime.time.min) #当天0点
+
+datetime.datetime.now()
+
+datetime.timedelta.days
