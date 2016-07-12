@@ -50,8 +50,6 @@ class QdailySpider(scrapy.spiders.Spider):
                             if delta.days == self.end_day:
                                 raise CloseSpider('today scrapy end')
 
-
-
                     #no content and have heart&conment but not add
                     item = NewsItem(title=title,news_url=news_url,pic=pic,topic=topic,time=date)
                     yield item
