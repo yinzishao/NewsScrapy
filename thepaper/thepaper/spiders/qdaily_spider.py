@@ -1,29 +1,27 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-import datetime
-from scrapy.exceptions import CloseSpider
 
 __author__ = 'yinzishao'
 
+from scrapy.exceptions import CloseSpider
 import scrapy
 from bs4 import BeautifulSoup
-import time
-import re
 import logging
 from thepaper.items import NewsItem
 import json
 logger = logging.getLogger("QdailySpider")
+from thepaper.settings import *
 
 class QdailySpider(scrapy.spiders.Spider):
     domain = "http://www.qdaily.com/"
     name = "qdaily"
     allowed_domains = ["qdaily.com",]
-    end_day = 3     #终结天数
-    #爬取新闻的×天前的相对时间，默认当天凌晨。也就是爬取当天凌晨的×天前的新闻
-    end_now = datetime.datetime.combine(datetime.date.today(), datetime.time.min) #当天0点
-    # end_now = datetime.datetime.now() #当时
+    end_day = END_DAY     #终结天数
+    end_now = END_NOW
     start_urls = [
-        "http://www.qdaily.com/tags/29.html"    #top15
+        "http://www.qdaily.com/tags/29.html",    #top15
+        "http://www.qdaily.com/categories/18.html", #商业
+        # "http://www.qdaily.com/categories/categorymore/18/1468278491.json"
     ]
 
     def parse(self, response):
@@ -34,7 +32,7 @@ class QdailySpider(scrapy.spiders.Spider):
             for i in newslist.children:
                 #文章中间有其余无关信息
                 if i != u' ':
-                    news_url = i.a.get('href',None)
+                    news_url = self.domain+i.a.get('href',None)
                     pic = i.find("img").get('data-src') if i.find("img") else None
                     title = i.find("h3").string if i.find("h3") else None
                     conment = i.find(class_="iconfont icon-message").string if i.find(class_="iconfont icon-message") else 0
@@ -56,11 +54,16 @@ class QdailySpider(scrapy.spiders.Spider):
             lastkey = newslist.get("data-lastkey",None)
             logger.info(lastkey)
             if lastkey:
-                next_url = "http://www.qdaily.com/tags/tagmore/29/%s.json" % lastkey
+                if "tags" in response.url:
+                    next_url = "http://www.qdaily.com/tags/tagmore/29/%s.json" % lastkey
+                else:
+                    next_url = "http://www.qdaily.com/categories/categorymore/18/%s.json" % lastkey
+                # logger.info(next_url)
                 yield scrapy.Request(next_url,callback=self.parse_next_page)
-
+            else:
+                logger.warning("can't find next page")
         else:
-            logger.info("can't find newslit")
+            logger.warning("can't find newslit")
     def parse_next_page(self,response):
         data = json.loads(response.body)
         newslist = data['data']["feeds"]
@@ -96,7 +99,10 @@ class QdailySpider(scrapy.spiders.Spider):
         #下一页
         if data['data']['has_more']:
             last_key = data['data']['last_key']
-            next_url = "http://www.qdaily.com/tags/tagmore/29/%s.json" % last_key
+            if "tags" in response.url:
+                next_url = "http://www.qdaily.com/tags/tagmore/29/%s.json" % last_key
+            else:
+                next_url = "http://www.qdaily.com/categories/categorymore/18/%s.json" % last_key
             yield scrapy.Request(next_url,callback=self.parse_next_page)
 
 

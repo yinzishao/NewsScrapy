@@ -8,7 +8,7 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
-
+import datetime
 BOT_NAME = 'thepaper'
 
 SPIDER_MODULES = ['thepaper.spiders']
@@ -135,3 +135,8 @@ PROXIES=[
     {'ip_port': '122.96.59.104:80', 'user_pass': ''},
     {'ip_port': '122.224.249.122:8088', 'user_pass': ''},
 ]
+
+END_DAY = 1
+#爬取新闻的×天前的相对时间，默认当天凌晨。也就是爬取当天凌晨的×天前的新闻
+END_NOW = datetime.datetime.combine(datetime.date.today(), datetime.time.min) #当天0点
+# END_NOW = datetime.datetime.now() #当时

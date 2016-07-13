@@ -1,14 +1,19 @@
-http://www.thepaper.cn/index_masonry.jsp?topCids=1495258,&_=1467902491392
-http://www.thepaper.cn/index_masonry.jsp?topCids=1495258,&_=1467904799637
-http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1495258,1494171,1495064,1495259,1495130,&pageidx=2&lastTime=1467891116598
-http://www.thepaper.cn/load_chosen.jsp?nodeids=25949&topCids=1495258,1494171,1495064,1495130,1495285,&pageidx=2&lastTime=1467893376408
-1467893376408
- pathParse: function(path,pageidx){        
-            return function(pageidx){
-                var lastTime = $('#last' + masonry_pageidx).attr("lastTime");
-                masonry_pageidx = parseInt($('#last' + masonry_pageidx).attr("pageIndex"));
-                masonry_pageidx = masonry_pageidx + 1;
-                return "load_chosen.jsp?nodeids=25949&topCids=1495258,1494171,1495064,1495259,1495130
-,&pageidx=" + masonry_pageidx + "&lastTime=" + lastTime;
-            }
-        }
+<a href='/31774?pg=2' class='insert-more show-more'
+ _p=40069684 _wid='711f470d-d16e-432d-bda5-13c3a22e3689' _n=2 ><span><b class="b"><span class="thin"
+>More</span> Articles</b></span></a>
+40069690
+post :
+http://travelweekly-china.com/Dyna.asmx/PageContentList
+{"req":{"PageKey":"40069682","WidgetId":"711f470d-d16e-432d-bda5-13c3a22e3689","PageNumber":"2"}}
+
+
+travelweekchina
+
+a = u'\u65b0\u7f57\u9152\u5e97\u96c6\u56e2\u65d7\u4e0b\u9ad8\u7aef\u5546\u52a1\u9152\u5e97\u54c1\u724c\u65b0\u7f57\u8212\u6cf0\u9152\u5e97\u7ee7\u7eed\u4e0d\u65ad\u6269\u5f20\uff0c\u5929\u5b89\u65b0\u7f57\u8212\u6cf0\u9152\u5e977\u670811\u65e5\u5168\u65b0\u4eae\u76f8\u3002...&nbsp;'
+>>> sss = BeautifulSoup(a)
+
+新闻中会有\xa0
+可能是空格导致的错误
+
+unicode(news_list[1].p)
+content = unicode(news.p).replace(u'\xa0', u'').replace("<p>","").replace("<\p>","")

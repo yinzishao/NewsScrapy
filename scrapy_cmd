@@ -29,6 +29,9 @@ soup.select('div[class="news_li"]')
 
 .has_attr("lasttime")
 
+PageElement.replace_with()
+
+unicode(news_list[1].p)
 
 -------------------------------------------------
 #re
