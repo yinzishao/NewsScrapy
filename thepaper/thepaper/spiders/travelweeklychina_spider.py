@@ -76,8 +76,13 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
             for news in news_list:
                 title = news.span.a.string
                 url = news.span.a.get("href",None)
-                news.p.a.replace_with("")
-                content = unicode(news.p).replace(u'\xa0', u'').replace("<p>","").replace("<\p>","")
+                # 格式<p>u'XXXXX\xa0'<a>XX<\a><\p>
+                # content = unicode(news.p).replace(u'\xa0', u'').replace("<p>","").replace("</p>","")
+                #可以获取到p的内容
+                #TODO:没有replace(u'\xa0'),仍然不知出现编码问题的原因，暂不处理
+                content = news.p.strings.next()
+
+
                 if url:
                     #列表并没有时间，所以不能设定停止条件
                     yield scrapy.Request(self.domain+url,callback=self.parse_news)

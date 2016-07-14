@@ -12,12 +12,22 @@ class ThepaperItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass
-
+"""
+新闻(标题,摘要,正文,url,发布时间,爬从抓取的时间,引用的网站名,引用的源url,作者,已阅读量,已评论量,新闻图片,所在网站的新闻标号,所在网站所属目录)
+"""
 class NewsItem(scrapy.Item):
-    title = scrapy.Field()
-    news_url = scrapy.Field()
-    content = scrapy.Field()
-    pic = scrapy.Field()
-    topic = scrapy.Field()
-    time = scrapy.Field()
-    tags = scrapy.Field()
+    title = scrapy.Field()      #标题
+    abstract = scrapy.Field()   #摘要
+    news_date = scrapy.Field()  #发布时间
+    content = scrapy.Field()    #正文
+    news_url = scrapy.Field()   #url
+    crawl_date = scrapy.Field() #爬从抓取的时间
+    referer_web = scrapy.Field()#引用的网站名
+    referer_url = scrapy.Field()#引用的源url
+    author = scrapy.Field()     #作者
+    read_num = scrapy.Field()   #已阅读量
+    conment_num =scrapy.Field() #已评论量
+    pic = scrapy.Field()        #新闻图片
+    news_no = scrapy.Field()    #所在网站新闻标号
+    topic = scrapy.Field()      #所在网站所属目录
+    # tags = scrapy.Field()

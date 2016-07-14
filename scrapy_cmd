@@ -33,6 +33,8 @@ PageElement.replace_with()
 
 unicode(news_list[1].p)
 
+如果tag中包含多个字符串 [2] ,可以使用 .strings 来循环获取:
+
 -------------------------------------------------
 #re
 
@@ -50,5 +52,8 @@ time.strptime(date,"%Y-%m-%d")
 datetime.datetime.combine(datetime.date.today(), datetime.time.min) #当天0点
 
 datetime.datetime.now()
+
+datetime.datetime.strptime(news_date.encode('utf-8'),"%Y年%m月%d日 %H:%M:%S")
+
 
 datetime.timedelta.days
