@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+import datetime
 from scrapy.exceptions import CloseSpider
 
 __author__ = 'yinzishao'
@@ -8,12 +9,15 @@ import scrapy
 from bs4 import BeautifulSoup
 import re
 from thepaper.items import NewsItem
-
-
+import logging
+from thepaper.settings import *
+logger = logging.getLogger("ThepaperSpider")
 class ThepaperSpider(scrapy.spiders.Spider):
     domain = "http://www.thepaper.cn/"
     name = "thepaper"
     allowed_domains = ["thepaper.cn"]
+    end_day = END_DAY
+    end_now = END_NOW
     start_urls = [
         # "http://www.thepaper.cn",
         "http://www.thepaper.cn/index_masonry.jsp",
@@ -26,8 +30,10 @@ class ThepaperSpider(scrapy.spiders.Spider):
         #爬取首页新闻列表
         for i in self.fetch_newslist(soup):
             # raise CloseSpider(str(i['time'] == u"一天前"))
-            if i['time'] == "一天前": raise CloseSpider("today news end")
-            yield i
+            # if i['time'] == "一天前": raise CloseSpider("today news end")
+            request = scrapy.Request(i['news_url'],callback=self.parse_news)
+            request.meta['item'] = i
+            yield request
 
         #爬取下一页的链接
         lasttime = "nothing"
@@ -66,8 +72,42 @@ class ThepaperSpider(scrapy.spiders.Spider):
                 #log.msg("can't find lasttime or pageindex", level=log.INFO)
 
         for i in self.fetch_newslist(np_soup):
-            if i['time'] == u"1天前": raise CloseSpider("today news end")
-            yield i
+
+            # if i['time'] == u"1天前": raise CloseSpider("today news end")
+            # yield i
+            #爬取进入news_url爬取内容
+            request = scrapy.Request(i['news_url'],callback=self.parse_news)
+            request.meta['item'] = i
+            yield request
+    def parse_news(self,response):
+        item = response.meta['item']
+
+        #TODO：新闻列表中会有专题，里面没有新闻的内容。现在是抛弃！
+        soup = BeautifulSoup(response.body)
+        #爬取新闻
+        news_txt=soup.find("div",class_="news_txt")
+        if news_txt:
+            content = news_txt.text
+            news_about = soup.find("div",class_="news_about")
+            #referer_web,news_date
+            if news_about:
+                referer_web = news_about.p.string
+                news_date = news_about.p.next_sibling.next_sibling.text[0:16]
+                struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M")
+                delta = self.end_now-struct_date
+                if delta.days == self.end_day:
+                    raise CloseSpider('today scrapy end')
+                item["referer_web"]=referer_web
+                item["content"]=content
+                item["crawl_date"]=NOW
+                yield item
+
+
+        else:
+
+            logger.info("news page can't find news_txt.That may be a theme")
+
+
 
     def fetch_newslist(self,soup):
         #爬取新闻链接
@@ -76,13 +116,18 @@ class ThepaperSpider(scrapy.spiders.Spider):
         for news in news_list:
             if news.has_attr("lasttime"):break  #首页出现的特殊异常
             item = NewsItem()
+
             item["title"] = news.h2.a.string    #题目
             item["news_url"] = self.domain+news.h2.a.get("href") #新闻链接
-            item["content"] = news.p.string     #简介
+            item["abstract"] = news.p.string     #简介
             item["pic"] = news.img.get("src")   #图片链接
             topic = news.select('div[class="pdtt_trbs"]')
             if topic:
                 item["topic"] = topic[0].a.string  #专题
-                item["time"]=topic[0].span.string  #对比爬取时间的时间
+                # item["time"]=topic[0].span.string  #对比爬取时间的时间
+            news_no = news.find('a',class_="tiptitleImg").get("data-id",None)
+            item['news_no']=news_no
+            item['conment_num'] = news.find("span",class_="trbszan").string if news.find("span",class_="trbszan") else None
             res.append(item)
+
         return res
