@@ -68,12 +68,12 @@ class Wallstreetcn(scrapy.spiders.Spider):
             raise CloseSpider('today scrapy end')
         title = soup.find("h1",class_="article-title").string if soup.find("h1",class_="article-title") else None
         author = soup.find("span",class_="item author").a.string if soup.find("span",class_="item author") else None
-        conment_num = soup.find("span",class_="wscn-cm-counter").string if soup.find("span",class_="wscn-cm-counter") else None
+        comment_num = soup.find("span",class_="wscn-cm-counter").string if soup.find("span",class_="wscn-cm-counter") else None
         content = soup.find("div",class_="article-content").text if soup.find("div",class_="article-content") else None
         news_no = response.url.rsplit("/",1)[-1]
         item["title"]=title
         item["author"]=author
-        item["conment_num"]=conment_num
+        item["comment_num"]=comment_num
         item["content"]=content
         item["news_date"]=news_date
         item["crawl_date"]=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

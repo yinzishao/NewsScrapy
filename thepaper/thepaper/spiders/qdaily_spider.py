@@ -35,7 +35,7 @@ class QdailySpider(scrapy.spiders.Spider):
                     news_url = self.domain+i.a.get('href',None)
                     pic = i.find("img").get('data-src') if i.find("img") else None
                     title = i.find("h3").string if i.find("h3") else None
-                    conment = i.find(class_="iconfont icon-message").string if i.find(class_="iconfont icon-message") else 0
+                    comment = i.find(class_="iconfont icon-message").string if i.find(class_="iconfont icon-message") else 0
                     heart = i.find(class_="iconfont icon-heart").string if i.find(class_="iconfont icon-heart") else 0
                     topic = i.find(class_="category").span.string if i.find(class_="category") else 0
                     date =None
