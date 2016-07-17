@@ -80,7 +80,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
             request.meta['item'] = i
             yield request
     def parse_news(self,response):
-        item = response.meta['item']
+        item = response.meta.get("item",NewsItem())
 
         #TODO：新闻列表中会有专题，里面没有新闻的内容。现在是抛弃！
         soup = BeautifulSoup(response.body)

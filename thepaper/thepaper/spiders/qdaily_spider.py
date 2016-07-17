@@ -21,7 +21,6 @@ class QdailySpider(scrapy.spiders.Spider):
     start_urls = [
         "http://www.qdaily.com/tags/29.html",    #top15
         "http://www.qdaily.com/categories/18.html", #商业
-        # "http://www.qdaily.com/categories/categorymore/18/1468278491.json"
     ]
 
     def parse(self, response):
@@ -35,22 +34,20 @@ class QdailySpider(scrapy.spiders.Spider):
                     news_url = self.domain+i.a.get('href',None)
                     pic = i.find("img").get('data-src') if i.find("img") else None
                     title = i.find("h3").string if i.find("h3") else None
-                    comment = i.find(class_="iconfont icon-message").string if i.find(class_="iconfont icon-message") else 0
+                    comment_num = i.find(class_="iconfont icon-message").string if i.find(class_="iconfont icon-message") else 0
                     heart = i.find(class_="iconfont icon-heart").string if i.find(class_="iconfont icon-heart") else 0
                     topic = i.find(class_="category").span.string if i.find(class_="category") else 0
-                    date =None
+                    news_date =None
                     if i.find(name="span", attrs={"data-origindate": True}):
-                        date= i.find(name="span", attrs={"data-origindate": True}).get("data-origindate",None)
-                        if date:
-                            date = date[:-6]
-                            struct_date = datetime.datetime.strptime(date,"%Y-%m-%d %H:%M:%S")
-                            delta = self.end_now-struct_date
-                            if delta.days == self.end_day:
-                                raise CloseSpider('today scrapy end')
+                        news_date= i.find(name="span", attrs={"data-origindate": True}).get("data-origindate",None)
+                        if news_date:
+                            news_date = news_date[:-6]
 
                     #no content and have heart&conment but not add
-                    item = NewsItem(title=title,news_url=news_url,pic=pic,topic=topic,time=date)
-                    yield item
+                    item = NewsItem(title=title,news_url=news_url,pic=pic,topic=topic,news_date=news_date,comment_num=comment_num)
+                    request = scrapy.Request(news_url,callback=self.parse_article)
+                    request.meta["item"] = item
+                    yield request
             lastkey = newslist.get("data-lastkey",None)
             logger.info(lastkey)
             if lastkey:
@@ -80,22 +77,16 @@ class QdailySpider(scrapy.spiders.Spider):
                 id = post.get("id",None)
                 datatype = news.get("datatype",None)
 
-                date= post.get("publish_time",None)
-                if date:
-                    date = date[:-6]
-
-                    #结束条件,对比几天后
-
-                    struct_date = datetime.datetime.strptime(date,"%Y-%m-%d %H:%M:%S")
-                    delta = self.end_now-struct_date
-                    if delta.days == self.end_day:
-                        raise CloseSpider('today scrapy end')
+                news_date= post.get("publish_time",None)
+                if news_date:
+                    news_date = news_date[:-6]
                 #文章
                 if id and datatype:
-                    article_url = self.domain+"%s/%s" % (datatype,id)
-                    # yield scrapy.Request(article_url,callback=self.parse_article)
-                    news = NewsItem(title=title,news_url=article_url,pic=pic,topic=topic,time=date)
-                    yield news
+                    news_url = self.domain+"%s/%s" % (datatype+"s",id)
+                    item = NewsItem(title=title,news_url=news_url,pic=pic,topic=topic,news_date=news_date)
+                    request = scrapy.Request(news_url,callback=self.parse_article)
+                    request.meta['item'] = item
+                    yield request
         #下一页
         if data['data']['has_more']:
             last_key = data['data']['last_key']
@@ -108,11 +99,26 @@ class QdailySpider(scrapy.spiders.Spider):
 
 
     def parse_article(self,response):
-        pass
-
-
-
-
+        #content,news_no,crawl_date
+        item = response.meta.get("item",NewsItem())
+        news_date = item.get("news_date",None)
+        if news_date:
+            struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M:%S")
+            delta = self.end_now-struct_date
+            print delta.days
+            if delta.days == self.end_day:
+                raise CloseSpider('today scrapy end')
+        soup =BeautifulSoup(response.body)
+        author = soup.find("span",class_="name").text if soup.find("span",class_="name") else None
+        abstract =  soup.find("p",class_="excerpt").text if soup.find("p",class_="excerpt") else None
+        content = soup.find("div",class_="detail").text if soup.find("div",class_="detail") else None
+        news_no = response.url.split("/")[-1][:-5]
+        item["author"] = author
+        item["abstract"] = abstract
+        item["content"] = content
+        item["crawl_date"] = NOW
+        item["news_no"] = news_no
+        yield item
 
 
 

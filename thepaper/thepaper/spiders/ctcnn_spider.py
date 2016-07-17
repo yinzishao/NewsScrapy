@@ -26,7 +26,7 @@ class CtcnnSpider(scrapy.spiders.Spider):
     def start_requests(self):
         return [
             scrapy.Request("http://www.ctcnn.com/",callback=self.parse),
-            # scrapy.FormRequest(self.start_url,formdata={'page':'1'},callback=self.parse_newest),
+            # scrapy.FormRequest(self.start_url,formdata={'page':'1'},callback=self.parse_newest),  #TODO something wrong
 
         ]
     #首页的原创内容
@@ -42,7 +42,6 @@ class CtcnnSpider(scrapy.spiders.Spider):
             item = NewsItem(title=title,abstract=abstract,news_url=news_url)
             request = scrapy.Request(news_url,self.parse_news,dont_filter=True)
             request.meta["item"] = item
-            print request
             yield request
 
     #最新内容的列表
@@ -52,6 +51,7 @@ class CtcnnSpider(scrapy.spiders.Spider):
         if li:
             for news in li :
                 news_date = news.find(class_="time").string[2:] if news.find(class_="time") else None
+                #TODO make wrong
                 # struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M")
                 # #结束条件
                 # delta = self.end_now-struct_date
@@ -65,7 +65,6 @@ class CtcnnSpider(scrapy.spiders.Spider):
                 item = NewsItem(title=title,news_url=news_url,abstract=abstract,pic=pic,topic=topic,news_date=news_date)
                 request = scrapy.Request(news_url,callback=self.parse_news,dont_filter=True)
                 request.meta["item"] = item
-                print request
                 yield request
         else:
             logger.info("can't find news list")
@@ -75,7 +74,6 @@ class CtcnnSpider(scrapy.spiders.Spider):
         new_request = scrapy.FormRequest(self.start_url,formdata={'page':str(int(page)+1)},callback=self.parse_newest)
         yield new_request
     def parse_news(self,response):
-        print response.url
         item = response.meta.get("item",NewsItem())
         soup = BeautifulSoup(response.body,"lxml")
         topic,referer_web,author,news_date=None,None,None,None

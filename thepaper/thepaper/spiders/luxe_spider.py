@@ -18,7 +18,7 @@ class LuxeSpider(scrapy.spiders.Spider):
     end_day = END_DAY
     end_now = END_NOW
     index_page = 1
-    crawl_page = 5
+    crawl_page = 50
     page_url = "http://luxe.co/page/%s/"
     start_urls =[
         page_url % index_page
@@ -36,12 +36,7 @@ class LuxeSpider(scrapy.spiders.Spider):
                         date_aut = list(news.find("p",class_="omc-date-time-one").strings)
                         author = date_aut[1]
                         news_date = date_aut[2][5:]
-                        #结束条件
-                        struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d")
-                        delta = self.end_now-struct_date
-                        if delta.days == self.end_day:
-                            pass
-                            # raise CloseSpider('today scrapy end')
+
                     titile = news.h2.text if news.h2 else None
                     news_url= news.h2.a.get("href",None) if news.h2.a else None
                     news_no = news_url.rsplit("/")[-2]
@@ -79,7 +74,15 @@ class LuxeSpider(scrapy.spiders.Spider):
             next_url = self.page_url % next_page_number
             yield scrapy.Request(next_url,callback=self.parse)
     def parse_news(self,response):
-        item = response.meta["item"]
+        item = response.meta.get("item",None)
+        #把结束条件移到爬取内容中，以免引起事务的错误
+        news_date = item.get("news_date",None)
+        if news_date:
+            struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d")
+            delta = self.end_now-struct_date
+            if delta.days == self.end_day:
+                # pass
+                raise CloseSpider('today scrapy end')
         soup = BeautifulSoup(response.body)
         news_content_group = soup.find("div",class_="entry-content group")
         #去除相关阅读
