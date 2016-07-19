@@ -141,3 +141,5 @@ END_DAY = 1
 END_NOW = datetime.datetime.combine(datetime.date.today(), datetime.time.min) #当天0点
 # END_NOW = datetime.datetime.now() #当时
 NOW = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") #现在时间的格式
+
+HTTPERROR_ALLOWED_CODES= [521]
