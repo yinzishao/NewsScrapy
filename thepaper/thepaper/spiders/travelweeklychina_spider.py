@@ -21,6 +21,11 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
     start_urls = [
         "http://travelweekly-china.com/",
     ]
+    """
+    因为需要爬12个类别的新闻。一起爬取的时候终止条件不应该有一个种类的新过了时间就停止。
+    应该是12个类别的新闻都达到结束时间时，结束。
+    而且因为是异步的。爬取一个页面的新闻会不按时间顺序爬取，所以我们对一个页面的所有新闻都爬取才结束。
+    """
     flag = {}
     #根据首页的新闻类别爬取各个类别的url
     def parse(self, response):
@@ -39,8 +44,11 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
         # yield scrapy.Request("http://travelweekly-china.com/31774",callback=self.parse_topic)
     #根据每个类型的首页得到新闻json的接口与参数
     def parse_topic(self,response):
-
         """
+
+        :param response:
+        :return:抛出每个类型的第一页访问json
+
         爬取下一页的链接
         POST请求
         需要三个参数：
@@ -48,7 +56,7 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
             WidgetId
             PageNumber
         """
-        # print response.url
+
         soup = BeautifulSoup(response.body,"lxml")
         next_obj = soup.find("a",class_="insert-more show-more")
         #如果有下一页
@@ -119,6 +127,7 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
         PageKey = post_data['PageKey']
         flag_id =str(int(PageKey)-40037910)
 
+        #继续抛出下一页的条件：该类型的标志为0
         if not self.flag[flag_id]:
             # print flag_id,"要爬取下一页！",pagenumber
             yield scrapy.Request(self.post_next_url,
@@ -127,7 +136,7 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
                                  headers={"Content-Type":"application/json"},
                                  body=json.dumps(post_data))
 
-    #异步并不按顺序！
+    #异步并不按时间顺序！
     def parse_news(self,response):
         # print response.url,"response"
         PageKey = response.meta.get("topic_id")
@@ -137,6 +146,11 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
         #2016-07-13
         news_date = soup.find("time").text if soup.find("time") else None
         # print self.flag[flag_id],int(PageNumber)
+        """
+        条件是该类别标记（self.flag[flag_id]）是0爬取，说明还没有爬到过期的。
+        爬取页面是该页的也继续爬取。因为一个页面的爬取顺序是异步的。
+        self.flag[flag_id]=过期页数
+        """
         if not self.flag[flag_id] or int(PageNumber)==self.flag[flag_id]:
             #，没有超出范围
 
