@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 __author__ = 'yinzishao'
 import re
-from scrapy.exceptions import CloseSpider
 import scrapy
 from bs4 import BeautifulSoup
 import logging
@@ -10,7 +9,7 @@ from thepaper.items import NewsItem
 import json
 logger = logging.getLogger("LeiphoneSpider")
 from thepaper.settings import *
-class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
+class LeiphoneSpider(scrapy.spiders.Spider):
     domain = "http://www.leiphone.com"
     name = "leiphone"
     allowed_domains = ["leiphone.com",]
@@ -64,6 +63,7 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
         item = response.meta.get("item",NewsItem())
         soup = BeautifulSoup(response.body)
         content = soup.find("div",class_=re.compile(r"pageCont")).text if soup.find("div",class_=re.compile(r"pageCont")) else None
+        item["crawl_date"]=NOW
         item["content"] =content
         yield item
 
