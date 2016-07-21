@@ -33,7 +33,7 @@ class LeiphoneSpider(scrapy.spiders.Spider):
             # if not self.flag or self.flag == pageindex:
 
             delta = self.end_now-struct_date
-            # print delta.days,"delta day ~~~~~~~~~~~~~~~~"
+            print delta.days,"delta day ~~~~~~~~~~~~~~~~"
             if delta.days > self.end_day-1:
                 self.flag =int(pageindex)
             else:
