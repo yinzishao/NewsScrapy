@@ -30,4 +30,4 @@ class NewsItem(scrapy.Item):
     pic = scrapy.Field()        #新闻图片
     news_no = scrapy.Field()    #所在网站新闻标号
     topic = scrapy.Field()      #所在网站所属目录
-    # tags = scrapy.Field()
+    tags = scrapy.Field()       #标签
