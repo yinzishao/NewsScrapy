@@ -3,8 +3,20 @@
 import requests
 
 __author__ = 'yinzishao'
+"""
+from pyvirtualdisplay import Display
+from selenium import webdriver
+import time
+display = Display(visible=0, size=(800, 600))
+display.start()
 
-header={"Referer":"http://www.cb.com.cn/opinion/","User-Agent":"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:46.0) Gecko/20100101 Firefox/46.0","Host":"www.cb.com.cn","Accept-Encoding":"gzip, deflate"}
-cookie = dict(__jsl_clearance="1468945508.897|0|/uCuYHboSHAz2jbLhDkQSPPw+ck=",__jsluid="d9015b89c5a096f554ff4d78353a61ec")
-r  = requests.get("http://www.cb.com.cn/opinion/",headers=header,cookies=cookie)
-# print r.text
+browser = webdriver.Firefox()
+# browser.get('http://www.baidu.com')
+browser.get('http://www.cb.com.cn/')
+print browser.page_source
+time.sleep(3)
+print browser.page_source
+browser.quit()
+
+display.stop()
+"""
