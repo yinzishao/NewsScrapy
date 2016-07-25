@@ -30,14 +30,15 @@ class NbdSpider(scrapy.spiders.Spider):
                 news_url = news.find("p",class_="h1").a.get("href",None) if news.find("p",class_="h1") else None
                 news_no = news_url.rsplit("/")[-1].split(".")[0]    #http://www.nbd.com.cn/articles/2016-07-25/1025147.html
                 title =  news.find("p",class_="h1").text.strip() if news.find("p",class_="h1") else None
-                abstract = news.find("p",class_="news-p").text.strip() if news.find("p",class_="news-p") else None
-                topic =news.find("div",class_="messge").contents[-2].a.text if news.find("div",class_="messge") else None
-                topic = topic if topic != '' else None
+                #显示不全，在新闻具体页拿
+                # abstract = news.find("p",class_="news-p").text.strip() if news.find("p",class_="news-p") else None
+                referer_web =news.find("div",class_="messge").contents[-2].a.text if news.find("div",class_="messge") else None
+                referer_web = referer_web if referer_web != '' else None
                 comment_num =soup.find("span",class_="fr").a.text if soup.find("span",class_="fr") else None
                 item = NewsItem(news_date=news_date,
                                 title=title,
-                                abstract=abstract,
-                                topic=topic,
+                                # abstract=abstract,
+                                referer_web=referer_web,
                                 comment_num=comment_num,
                                 news_no = news_no,
                                 news_url=news_url
@@ -54,4 +55,16 @@ class NbdSpider(scrapy.spiders.Spider):
             yield scrapy.Request(next_url)
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
+        soup = BeautifulSoup(response.body)
+        #antuhor 两种情况
+        if soup.find("div",class_="author"):
+            author = soup.find("div",class_="author").find_next("span").text
+        else :
+            author = soup.find("div",class_="author1").find_next("span").text if soup.find("div",class_="author1") else None
+        content = soup.find("div",class_="main-left-article").get_text(strip=True) if soup.find("div",class_="main-left-article") else None
+        abstract = soup.find("p",id="prompt").get_text(strip=True) if soup.find("p",id="prompt") else None
+        item['author'] = author
+        item['content'] =content
+        item['abstract'] =abstract
+        item['crawl_date']=NOW
         yield item
