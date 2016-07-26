@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from thepaper.util import judge_news_crawl
+
 __author__ = 'yinzishao'
 import re
 import scrapy
@@ -28,18 +30,16 @@ class Transport163Spider(scrapy.spiders.Spider):
         news_list = soup("div",class_="list_item clearfix")
         for news in news_list:
             news_date = news.find("span",class_="time").text if news.find("span",class_="time")else None
-            struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M:%S")
-            delta = self.end_now-struct_date
-            print delta.days,"delta day ~~~~~~~~~~~~~~~~"
-            if delta.days > self.end_day-1:
-                self.flag =int(pageindex)
-            else:
-                title = news.find("h2").text if news.find("h2") else None
-                news_url = news.find("h2").a.get("href",None) if news.find("h2") else None
-                abstract = news.find("p").contents[0] if news.find("p") else None
-                item = NewsItem(title=title,news_url=news_url,abstract=abstract,news_date=news_date)
+            title = news.find("h2").text if news.find("h2") else None
+            news_url = news.find("h2").a.get("href",None) if news.find("h2") else None
+            abstract = news.find("p").contents[0] if news.find("p") else None
+            item = NewsItem(title=title,news_url=news_url,abstract=abstract,news_date=news_date)
+            item = judge_news_crawl(item)   #判断是否符合爬取时间
+            if item:
                 request = scrapy.Request(news_url,callback=self.parse_news,meta={"item":item})
                 yield request
+            else:
+                self.flag = int(pageindex)
         if not self.flag:
             next_url = self.next_url % int(pageindex)+1
             yield scrapy.Request(next_url)

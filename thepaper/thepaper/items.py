@@ -29,5 +29,6 @@ class NewsItem(scrapy.Item):
     comment_num =scrapy.Field() #已评论量
     pic = scrapy.Field()        #新闻图片
     news_no = scrapy.Field()    #所在网站新闻标号
-    topic = scrapy.Field()      #所在网站所属目录
+    topic = scrapy.Field()      #所在网站所属主题
+    catalogue = scrapy.Field()  #所在网站所属目录
     tags = scrapy.Field()       #标签
