@@ -3,9 +3,16 @@ scrapy startproject peojectname
 
 apt-get install Python-bs4
 
-from bs4 import BeautifulSoup
+#开启某个爬虫
+scrapy crawl thepaper
 
-scrapy crawl thepaper | more
+#进入调试
+scrapy shell
+
+fetch("url")
+
+
+from bs4 import BeautifulSoup
 
 from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
 
