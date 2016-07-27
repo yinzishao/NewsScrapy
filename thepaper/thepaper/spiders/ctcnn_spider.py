@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from scrapy.exceptions import CloseSpider
+from thepaper.util import judge_news_crawl
 
 __author__ = 'yinzishao'
 
@@ -22,6 +23,7 @@ class CtcnnSpider(scrapy.spiders.Spider):
     # start_urls = [
     #     "http://www.ctcnn.com/json/index_article.jsp?t=1468244608275"
     # ]
+    flag=0
     start_url =  "%sjson/index_article.jsp?t=%s" % (domain,int(time.time()))
     def start_requests(self):
         return [
@@ -39,7 +41,7 @@ class CtcnnSpider(scrapy.spiders.Spider):
             title = news.h2.a.string if news.h2.a else None
             abstract = news.p.string if news.p else None
             news_url = self.domain+news.a.get("href",None) if news.a else None
-            item = NewsItem(title=title,abstract=abstract,news_url=news_url)
+            item = NewsItem(title=title,abstract=abstract,news_url=news_url,catalogue=u"原创内容")
             request = scrapy.Request(news_url,self.parse_news,dont_filter=True)
             request.meta["item"] = item
             yield request
@@ -47,32 +49,40 @@ class CtcnnSpider(scrapy.spiders.Spider):
     #最新内容的列表
     def parse_newest(self, response):
         soup = BeautifulSoup(response.body,"lxml")
+        page =response.request.body.split('=')[-1]
         li = soup.find_all('li')
         if li:
             for news in li :
                 news_date = news.find(class_="time").string[2:] if news.find(class_="time") else None
-                #TODO make wrong
-                # struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M")
-                # #结束条件
-                # delta = self.end_now-struct_date
-                # if delta.days == self.end_day:
-                #     raise CloseSpider('today scrapy end')
+                struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M")
+                news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
                 title = news.find(class_="title").string if news.find(class_="title") else None
                 news_url = self.domain+news.find(class_="title").a.get("href",None) if news.find(class_="title") else None
                 abstract = news.find(class_="info").string if news.find(class_="info") else None
                 pic = self.domain+news.find('img').get('src',None) if news.find('img') else None
                 topic = news.find(class_="type").string if news.find(class_="type") else None
-                item = NewsItem(title=title,news_url=news_url,abstract=abstract,pic=pic,topic=topic,news_date=news_date)
-                request = scrapy.Request(news_url,callback=self.parse_news,dont_filter=True)
-                request.meta["item"] = item
-                yield request
+                item = NewsItem(catalogue=u"最新内容",
+                                title=title,
+                                news_url=news_url,
+                                abstract=abstract,
+                                pic=pic,
+                                topic=topic,
+                                news_date=news_date)
+                item = judge_news_crawl(item)
+                if item:
+                    request = scrapy.Request(news_url,callback=self.parse_news,dont_filter=True)
+                    request.meta["item"] = item
+                    yield request
+                else:
+                    self.flag=page
         else:
             logger.info("can't find news list")
 
-        page =response.request.body.split('=')[-1]
+
         #下一页
-        new_request = scrapy.FormRequest(self.start_url,formdata={'page':str(int(page)+1)},callback=self.parse_newest)
-        yield new_request
+        if not self.flag:
+            new_request = scrapy.FormRequest(self.start_url,formdata={'page':str(int(page)+1)},callback=self.parse_newest)
+            yield new_request
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
         soup = BeautifulSoup(response.body,"lxml")
@@ -86,11 +96,6 @@ class CtcnnSpider(scrapy.spiders.Spider):
                 referer_web = span_list[0].text #出处
                 author = span_list[1].text  #作者
                 news_date = span_list[2].text   #发布时间
-                struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M:%S")
-                #结束条件
-                delta = self.end_now-struct_date
-                if delta.days == self.end_day:
-                    raise CloseSpider('today scrapy end')
         #内容
         content = soup.find("div",class_="article-content").text if soup.find("div",class_="article-content") else None
         #评论次数
@@ -106,6 +111,7 @@ class CtcnnSpider(scrapy.spiders.Spider):
         item['crawl_date'] =NOW
         item['topic']=topic
         item['news_no']=news_no
+
         yield item
         #
         #
