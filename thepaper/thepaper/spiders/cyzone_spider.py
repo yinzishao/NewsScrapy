@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from thepaper.util import judge_news_crawl
+
 __author__ = 'yinzishao'
 import re
 import scrapy
@@ -51,28 +53,28 @@ class CyzoneSpider(scrapy.spiders.Spider):
             news_date = info.span.get("data-time") if info.span else None   #时间戳
             struct_date = datetime.datetime.fromtimestamp(int(news_date))
             news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
-            delta = self.end_now-struct_date
-            print delta.days,"delta day ~~~~~~~~~~~~~~~~"
-            if delta.days > self.end_day-1:
-                self.mid_flag =int(pageindex)
-            else:
-                title =news.find("a",class_="item-title").text if news.find("a",class_="item-title") else None
-                news_url =news.find("a",class_="item-title").get("href",None) if news.find("a",class_="item-title") else None
-                abstract =news.find("p",class_="item-desc").text if news.find("p",class_="item-desc") else None
-                pic = news.find("img").get("src",None) if news.find("img") else None
-                id_result = re.search(r"/(\d+)\.html",news_url)
-                news_no = id_result.group(1) if id_result else None
 
-                item = NewsItem(abstract=abstract,
-                                news_url=news_url,
-                                pic=pic,
-                                title=title,
-                                author=author,
-                                news_no=news_no,
-                                news_date=news_date,)
+            title =news.find("a",class_="item-title").text if news.find("a",class_="item-title") else None
+            news_url =news.find("a",class_="item-title").get("href",None) if news.find("a",class_="item-title") else None
+            abstract =news.find("p",class_="item-desc").text if news.find("p",class_="item-desc") else None
+            pic = news.find("img").get("src",None) if news.find("img") else None
+            id_result = re.search(r"/(\d+)\.html",news_url)
+            news_no = id_result.group(1) if id_result else None
 
+            item = NewsItem(abstract=abstract,
+                            news_url=news_url,
+                            pic=pic,
+                            title=title,
+                            author=author,
+                            news_no=news_no,
+                            news_date=news_date,
+                            catalogue=u"中间推荐模板")
+            item = judge_news_crawl(item)
+            if item:
                 request = scrapy.Request(news_url,meta={"item":item},callback=self.parse_news)
                 yield request
+            else:
+                self.mid_flag =int(pageindex)
         if not self.mid_flag:
             pageindex = int(pageindex)+1
             next_url = self.middle_next_url % pageindex
@@ -102,28 +104,26 @@ class CyzoneSpider(scrapy.spiders.Spider):
             next_timestamp = origin_date if index == len(news_list)-1 else None #取最后一篇文章的时间戳作下一页的时间戳
             struct_date = datetime.datetime.fromtimestamp(int(origin_date))
             news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
-            delta = self.end_now-struct_date
-            print delta.days,"delta day ~~~~~~~~~~~~~~~~"
-            if delta.days > self.end_day-1:
-                self.quick_flag =int(self.quick_page)
-            else:
-
-                title =news.find("a",class_="item-title").text if news.find("a",class_="item-title") else None
-                news_url =news.find("a",class_="item-title").get("href",None) if news.find("a",class_="item-title") else None
-                pic = news.find("img").get("src",None) if news.find("img") else None
-                content =news.find("div",class_="item-desc").text if news.find("div",class_="item-desc") else None
-                if not content:
-                    import pdb;pdb.set_trace()
-                id_result = re.search(r"/(\d+)\.html",news_url)
-                news_no = id_result.group(1) if id_result else None
-                item = NewsItem(content=content,
-                                news_url=news_url,
-                                pic=pic,
-                                title=title,
-                                news_no=news_no,
-                                news_date=news_date)
+            title =news.find("a",class_="item-title").text if news.find("a",class_="item-title") else None
+            news_url =news.find("a",class_="item-title").get("href",None) if news.find("a",class_="item-title") else None
+            pic = news.find("img").get("src",None) if news.find("img") else None
+            content =news.find("div",class_="item-desc").text if news.find("div",class_="item-desc") else None
+            id_result = re.search(r"/(\d+)\.html",news_url)
+            news_no = id_result.group(1) if id_result else None
+            item = NewsItem(content=content,
+                            news_url=news_url,
+                            pic=pic,
+                            title=title,
+                            news_no=news_no,
+                            news_date=news_date,
+                            catalogue=u"快报")
+            item = judge_news_crawl(item)
+            if item:
                 request = scrapy.Request(news_url,meta={"item":item},callback=self.parse_quick_news)
                 yield request
+            else:
+                self.quick_flag =int(self.quick_page)
+
         if not self.quick_flag:
             if next_timestamp:
                 next_quick_url = self.quick_json_url % next_timestamp
