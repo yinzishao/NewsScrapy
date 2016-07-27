@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from thepaper.util import judge_news_crawl
+
 __author__ = 'yinzishao'
 import re
 import scrapy
@@ -31,30 +33,27 @@ class LeiphoneSpider(scrapy.spiders.Spider):
             struct_date= datetime.datetime.strptime(origin_date,"%Y / %m / %d\n%H:%M")
             news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
             # if not self.flag or self.flag == pageindex:
-
-            delta = self.end_now-struct_date
-            print delta.days,"delta day ~~~~~~~~~~~~~~~~"
-            if delta.days > self.end_day-1:
-                self.flag =int(pageindex)
-            else:
-                topic = news.find("div",class_="img").a.string.strip() if news.find("div",class_="img") else None
-                pic = news.find("img").get("src",None) if news.find("img") else None
-                title = news.find("div",class_="tit").string if news.find("div",class_="tit") else None
-                abstract = news.find("div",class_="des").string if news.find("div",class_="des") else None
-                author = news.find("div",class_="aut").text.strip() if news.find("div",class_="aut") else None
-                news_url = news.find("div",class_="tit").parent.get("href") if news.find("div",class_="tit") else None
-                comment_num = news.find("a",class_="cmt").text if news.find("a",class_="cmt") else None
-                item = NewsItem(topic=topic,
-                                news_url=news_url,
-                                pic=pic,
-                                title=title,
-                                abstract=abstract,
-                                author=author,
-                                comment_num=comment_num,
-                                news_date=news_date)
-
+            topic = news.find("div",class_="img").a.string.strip() if news.find("div",class_="img") else None
+            pic = news.find("img").get("src",None) if news.find("img") else None
+            title = news.find("div",class_="tit").string if news.find("div",class_="tit") else None
+            abstract = news.find("div",class_="des").string if news.find("div",class_="des") else None
+            author = news.find("div",class_="aut").text.strip() if news.find("div",class_="aut") else None
+            news_url = news.find("div",class_="tit").parent.get("href") if news.find("div",class_="tit") else None
+            comment_num = news.find("a",class_="cmt").text if news.find("a",class_="cmt") else None
+            item = NewsItem(topic=topic,
+                            news_url=news_url,
+                            pic=pic,
+                            title=title,
+                            abstract=abstract,
+                            author=author,
+                            comment_num=comment_num,
+                            news_date=news_date)
+            item = judge_news_crawl(item)
+            if item:
                 request = scrapy.Request(news_url,meta={"item":item},callback=self.parse_news)
                 yield request
+            else:
+                self.flag =int(pageindex)
         if not self.flag:
             pageindex = int(pageindex)+1
             next_url = self.next_url % pageindex

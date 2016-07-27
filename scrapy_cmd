@@ -33,7 +33,7 @@ scrapy crawl meadin -o log/meadin.json --logfile log/meadin.log
 scrapy crawl ctcnn -o log/ctcnn.json --logfile log/ctcnn.log
 scrapy crawl qdaily -o log/qdaily.json --logfile log/qdaily.log
 scrapy crawl twc -o log/twc.json --logfile log/twc.log
-scrapy crawl leiphone -o leiphone.json --logfile log/leiphone.log
+scrapy crawl leiphone -o log/leiphone.json --logfile log/leiphone.log
 scrapy crawl cyzone -o log/cyzone.json --logfile log/cyzone.log
 scrapy crawl 163 -o log/163.json --logfile log/163.log
 scrapy crawl wallstreetcn -o log/wallstreetcn.json --logfile log/wallstreetcn.log

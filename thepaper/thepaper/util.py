@@ -13,17 +13,19 @@ from thepaper.settings import *
 def judge_today(date):
     return date.tm_mday == time.localtime().tm_mday
 
-def judge_news_crawl(item):
+def judge_news_crawl(item,end_day=END_DAY):
     """
     判断是否符合爬取的时间
-    :param item:
+    :param
+    item:
+    end_day:指定结束天数
     :return: item or None
     """
     news_date = item.get("news_date",None)
     if news_date:
         struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M:%S")
         delta = END_NOW-struct_date
-        if delta.days < END_DAY:
+        if delta.days < end_day:
             return item
         else:
             return None
