@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from thepaper.util import judge_news_crawl
+
 __author__ = 'yinzishao'
 import re
 from scrapy.exceptions import CloseSpider
@@ -18,6 +20,7 @@ class LuxeSpider(scrapy.spiders.Spider):
     end_day = END_DAY
     end_now = END_NOW
     index_page = 1
+    flag=0
     crawl_page = 50
     page_url = "http://luxe.co/page/%s/"
     start_urls =[
@@ -25,6 +28,11 @@ class LuxeSpider(scrapy.spiders.Spider):
     ]
     def parse(self, response):
         soup = BeautifulSoup(response.body)
+        #获取下一页链接
+        origin_url = response.url
+        next_page_number = 2
+        if "page" in origin_url:
+            next_page_number = int(origin_url.rsplit('/')[-2])+1
         search = soup.find("section",id="omc-main")
         if search:
             news_list = search.find_all("article")
@@ -36,7 +44,8 @@ class LuxeSpider(scrapy.spiders.Spider):
                         date_aut = list(news.find("p",class_="omc-date-time-one").strings)
                         author = date_aut[1]
                         news_date = date_aut[2][5:]
-
+                        struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d")
+                        news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
                     titile = news.h2.text if news.h2 else None
                     news_url= news.h2.a.get("href",None) if news.h2.a else None
                     news_no = news_url.rsplit("/")[-2]
@@ -53,36 +62,47 @@ class LuxeSpider(scrapy.spiders.Spider):
                         abstract = news.find("p",class_="omc-blog-one-exceprt").text.strip()
                     pic = news.img.get("src",None) if news.img else None
                     #生成新闻item 并抛向解析内容
-                    item = NewsItem(news_url=news_url,title=titile,abstract=abstract,pic=pic,author=author,news_date=news_date,crawl_date=NOW,news_no=news_no,topic=topics)
-                    request =  scrapy.Request(news_url,callback=self.parse_news)
-                    request.meta["item"]=item
-                    if news_url:
-                        yield request
+                    item = NewsItem(news_url=news_url,
+                                    title=titile,
+                                    abstract=abstract,
+                                    pic=pic,
+                                    author=author,
+                                    news_date=news_date,
+                                    crawl_date=NOW,
+                                    news_no=news_no,
+                                    topic=topics)
+                    item = judge_news_crawl(item,end_day=END_DAY+1)
+                    if item:
+                        request =  scrapy.Request(news_url,callback=self.parse_news)
+                        request.meta["item"]=item
+                        if news_url:
+                            yield request
+                        else:
+                            logger.warning("can't find news url")
                     else:
-                        logger.info("can't find news url")
+                        self.flag =next_page_number-1
+
             else:
                 logger.info("can't find news list")
 
         else:
             logger.info("can't find main container")
-        #获取下一页链接
-        origin_url = response.url
-        next_page_number = 2
-        if "page" in origin_url:
-            next_page_number = int(origin_url.rsplit('/')[-2])+1
-        if next_page_number <self.crawl_page:
+
+        if not self.flag:
             next_url = self.page_url % next_page_number
             yield scrapy.Request(next_url,callback=self.parse)
     def parse_news(self,response):
         item = response.meta.get("item",None)
-        #把结束条件移到爬取内容中，以免引起事务的错误
-        news_date = item.get("news_date",None)
-        if news_date:
-            struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d")
-            delta = self.end_now-struct_date
-            if delta.days == self.end_day:
-                # pass
-                raise CloseSpider('today scrapy end')
+        # #把结束条件移到爬取内容中，以免引起事务的错误
+        # news_date = item.get("news_date",None)
+        # if news_date:
+        #     struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d")
+        #     news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
+        #
+        #     delta = self.end_now-struct_date
+        #     if delta.days == self.end_day:
+        #         # pass
+        #         raise CloseSpider('today scrapy end')
         soup = BeautifulSoup(response.body)
         news_content_group = soup.find("div",class_="entry-content group")
         #去除相关阅读
