@@ -53,6 +53,7 @@ class NbdSpider(scrapy.spiders.Spider):
         if not self.flag:
             next_url = self.next_url % (int(pageindex)+1)
             yield scrapy.Request(next_url)
+
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
         soup = BeautifulSoup(response.body)
