@@ -44,7 +44,7 @@ class CarnocSpider(scrapy.spiders.Spider):
                 pic = news.find('div').find('img',src = re.compile('http://pic.carnoc.com/file/*.?')).get('src') if news.find('div').find('img',src = re.compile('http://pic.carnoc.com/file/*.?')) else None
                 tags = news.find('div',class_ = 'keywordslist').text.strip()
                 item = NewsItem(
-                    news_date = news_date,
+                    news_date = news_date + ' 00:00:00',
                     title = title,
                     abstract = abstract,
                     news_no = news_no,
