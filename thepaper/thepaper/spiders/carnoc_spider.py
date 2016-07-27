@@ -31,7 +31,7 @@ class CarnocSpider(scrapy.spiders.Spider):
     def parse(self,response):
         origin_url = response.url
         pageindex = int(origin_url.rsplit("_",1)[1].replace('.html',''))
-        catalogue = re.search('</a> -&gt; ([\w\W]?) </i></h3>',response.body).group(1).decode("gb2312")
+        catalogue = re.search('</a> -&gt; ([\w\W]+?) </i></h3>',response.body).group(1).decode("gb2312")
         soup = BeautifulSoup(response.body,"lxml")
         news_list = soup.find_all('li')
         for news in news_list:
@@ -42,8 +42,9 @@ class CarnocSpider(scrapy.spiders.Spider):
                 title = news.find('a',href = re.compile('http://news.carnoc.com/list/*.?')).text.strip()
                 abstract = news.find('div').text.strip()
                 pic = news.find('div').find('img',src = re.compile('http://pic.carnoc.com/file/*.?')).get('src') if news.find('div').find('img',src = re.compile('http://pic.carnoc.com/file/*.?')) else None
-                tags = news.find('div',class_ = 'keywordslist').text.strip()
+                tags = news.find('div',class_ = 'keywordslist').text.strip() if news.find('div',class_ = 'keywordslist') else None
                 item = NewsItem(
+                    news_url =news_url,
                     news_date = news_date + ' 00:00:00',
                     title = title,
                     abstract = abstract,
@@ -51,7 +52,6 @@ class CarnocSpider(scrapy.spiders.Spider):
                     catalogue = catalogue,
                     pic = pic,
                     tags = tags,
-                    topic = None
                 )
                 item = judge_news_crawl(item)
                 if item:
@@ -66,16 +66,18 @@ class CarnocSpider(scrapy.spiders.Spider):
 
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
-        soup = BeautifulSoup(response.body)
+        soup = BeautifulSoup(response.body.decode("gbk"))
         referer_web = soup.find('span',id='source_baidu').find('a').text.strip()
         referer_url = soup.find('span',id='source_baidu').find('a').get('href')
-        author = soup.find('span',id='author_baidu').find('a').text.strip()
+        author = soup.find('span',id='author_baidu').find('a').text.strip() if soup.find('span',id='author_baidu').find('a') else None
         crawl_date = NOW
         news_date = soup.find('span',id='pubtime_baidu').text.strip()
-        comment_num = soup.find('span',class_ = 'pltit').find('b').text.strip()
-        zan = soup.find('span',class_ = 'zan-plus').text.strip()
+        comment_num = soup.find('span',class_ = 'pltit').find('b').text.strip() if soup.find('span',class_ = 'pltit') else 0
+        zan = soup.find('span',class_ = 'zan-plus').text.strip() if soup.find('span',class_ = 'zan-plus') else None
         read_num = int(comment_num) + int(zan)
+        content = soup.find("div",id="newstext").get_text(strip=True) if soup.find("div",id="newstext") else None
         item['referer_web'] = referer_web
+        item['content'] = content
         item['referer_url'] = referer_url
         item['author'] = author
         item['crawl_date'] = crawl_date
