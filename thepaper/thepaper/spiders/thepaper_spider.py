@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 import datetime
 from scrapy.exceptions import CloseSpider
+from thepaper.util import judge_news_crawl
 
 __author__ = 'yinzishao'
 
@@ -18,6 +19,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
     allowed_domains = ["thepaper.cn"]
     end_day = END_DAY
     end_now = END_NOW
+    flag = 0
     start_urls = [
         # "http://www.thepaper.cn",
         "http://www.thepaper.cn/index_masonry.jsp",
@@ -33,6 +35,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
             # if i['time'] == "一天前": raise CloseSpider("today news end")
             request = scrapy.Request(i['news_url'],callback=self.parse_news)
             request.meta['item'] = i
+            request.meta['pageindex'] = 1
             yield request
 
         #爬取下一页的链接
@@ -45,7 +48,6 @@ class ThepaperSpider(scrapy.spiders.Spider):
         # 格式：load_chosen.jsp?nodeids=25949&topCids=1495258,1494171,1495064,1495130,1495285,&pageidx=
         load_chosen = re.search(r'data.:."(.*)".+.masonry',html)
         page = 2
-        tp_url = ""
         if load_chosen :
             tp_url = "http://www.thepaper.cn/load_chosen.jsp?%s%s&lastTime=%s" % (load_chosen.group(1),page,lasttime)
             yield scrapy.Request(tp_url, callback=self.next_page_parse)
@@ -58,30 +60,26 @@ class ThepaperSpider(scrapy.spiders.Spider):
         np_soup = BeautifulSoup(html,"lxml")
         #格式：<div id="last2" lastTime="1467972702826" pageIndex="2" style="display:none;"></div>
         res = np_soup.find(name="div",attrs={"lasttime":True})
-        if res:
-            lasttime = res.get("lasttime",None)
-            pageindex = res.get("pageindex",None)
 
-            if lasttime and pageindex:
-                #终止条件，需更改，暂定前5页
-                # if int(pageindex) <8:
-                    pageindex = str(int(pageindex)+1)
-                    new_url = re.sub(r'pageidx=.*?&lastTime=.*',"pageidx=%s&lastTime=%s" % (pageindex,lasttime),url,1)
-                    yield scrapy.Request(new_url, callback=self.next_page_parse)
-            # else:
-                #log.msg("can't find lasttime or pageindex", level=log.INFO)
-
+        lasttime = res.get("lasttime",None) if res else None
+        pageindex = res.get("pageindex",None)if res else None
         for i in self.fetch_newslist(np_soup):
-
-            # if i['time'] == u"1天前": raise CloseSpider("today news end")
-            # yield i
-            #爬取进入news_url爬取内容
             request = scrapy.Request(i['news_url'],callback=self.parse_news)
             request.meta['item'] = i
+            request.meta["pageindex"] = i
             yield request
+        #终结条件
+        if not self.flag and lasttime:
+            pageindex = str(int(pageindex)+1)
+            new_url = re.sub(r'pageidx=.*?&lastTime=.*',"pageidx=%s&lastTime=%s" % (pageindex,lasttime),url,1)
+            yield scrapy.Request(new_url, callback=self.next_page_parse)
+        # else:
+            #log.msg("can't find lasttime or pageindex", level=log.INFO)
+
+
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
-
+        pageindex = response.meta.get("pageindex",None)
         #TODO：新闻列表中会有专题，里面没有新闻的内容。现在是抛弃！
         soup = BeautifulSoup(response.body)
         #爬取新闻
@@ -94,14 +92,17 @@ class ThepaperSpider(scrapy.spiders.Spider):
                 referer_web = news_about.p.string
                 news_date = news_about.p.next_sibling.next_sibling.text[0:16]
                 struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M")
-                delta = self.end_now-struct_date
-                if delta.days == self.end_day:
-                    raise CloseSpider('today scrapy end')
+                news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
                 item["referer_web"]=referer_web
+                item["news_date"]=news_date
                 item["content"]=content
                 item["crawl_date"]=NOW
-                yield item
-
+                # import pdb;pdb.set_trace()
+                item = judge_news_crawl(item)
+                if item:
+                    yield item
+                else:
+                    self.flag = pageindex
 
         else:
 
@@ -127,7 +128,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
                 # item["time"]=topic[0].span.string  #对比爬取时间的时间
             news_no = news.find('a',class_="tiptitleImg").get("data-id",None)
             item['news_no']=news_no
-            item['conment_num'] = news.find("span",class_="trbszan").string if news.find("span",class_="trbszan") else None
+            item['comment_num'] = news.find("span",class_="trbszan").string if news.find("span",class_="trbszan") else None
             res.append(item)
 
         return res
