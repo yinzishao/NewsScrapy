@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from scrapy.exceptions import CloseSpider
+from thepaper.util import judge_news_crawl
 
 __author__ = 'yinzishao'
 
@@ -22,10 +23,16 @@ class MeadinSpider(scrapy.spiders.Spider):
     ]
     end_day = END_DAY
     end_now = END_NOW
+    flag = 0
 
     def parse(self, response):
         soup = BeautifulSoup(response.body,"lxml")
-
+        origin_url = response.url
+        res = re.search(r'ndex_(.*?)\.shtml',origin_url)
+        new_index=1
+        if res:
+            index = res.group(1)
+            new_index = int(index)+1
         #爬取列表
         viewlist = soup.find_all("div","list list-640")
         if viewlist:
@@ -50,15 +57,12 @@ class MeadinSpider(scrapy.spiders.Spider):
                 item = NewsItem(title=title,news_url=news_url,abstract=abstract,pic=pic,topic=topic,news_date=news_date)
                 request = scrapy.Request(news_url,callback=self.parse_news)
                 request.meta['item']=item
+                request.meta['pageindex']=index
                 yield request
 
         else:
             logger.info("can't find news list")
-        origin_url = response.url
-        res = re.search(r'ndex_(.*?)\.shtml',origin_url)
-        if res:
-            index = res.group(1)
-            new_index = int(index)+1
+        if not self.flag and new_index:
             new_url = re.sub(r'ndex_(.*?)\.shtml','ndex_%s.shtml' % str(new_index),origin_url)
             yield scrapy.Request(new_url)
         else:
@@ -67,6 +71,7 @@ class MeadinSpider(scrapy.spiders.Spider):
     def parse_news(self,response):
         #content,news_date,news_no,crawl_date,referer_web
         item = response.meta.get("item",NewsItem())
+        pageindex = response.meta.get("pageindex",1)
         soup = BeautifulSoup(response.body)
         # news_date = item.get("news_date",None)
         #需要爬取具体的时间
@@ -74,10 +79,10 @@ class MeadinSpider(scrapy.spiders.Spider):
         #http://info.meadin.com/PictureNews/2938_1.shtml Exception
         if news_date:
 
-            struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M:%S")
-            delta = self.end_now-struct_date
-            if delta.days == self.end_day:
-                raise CloseSpider('today scrapy end')
+            # struct_date = datetime.datetime.strptime(news_date,"%Y-%m-%d %H:%M:%S")
+            # delta = self.end_now-struct_date
+            # if delta.days == self.end_day:
+            #     raise CloseSpider('today scrapy end')
             referer_web = list(soup.find("p",class_="source").strings)[-1] if soup.find("p",class_="source") else None
             #爬取正文
             art,content = None,None
@@ -92,6 +97,10 @@ class MeadinSpider(scrapy.spiders.Spider):
             item["referer_web"]=referer_web
             item["crawl_date"]=NOW
             item["news_no"]=news_no
-            yield item
+            item = judge_news_crawl(item)
+            if item:
+                yield item
+            else:
+                self.flag = pageindex
         else:
             logger.warning("can't find news_date.the url is %s" % response.url)
