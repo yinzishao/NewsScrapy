@@ -23,12 +23,17 @@ class MhywSpider(scrapy.spiders.Spider):
     ]
 
     def parse(self,response):
-        pageindex = 0
-        soup = BeautifulSoup(response.body,"lxml")
+        origin_url = response.url
+        if 'index' not in origin_url:
+            pageindex = 0
+        else:
+            pageindex = origin_url.rsplit('index_',1)[-1].replace('.html','')
+            pageindex = int(pageindex)
+        soup = BeautifulSoup(response.body.decode('utf8'),"lxml")
         news_list = soup.find_all('li',style = 'overflow:hidden;')
         for news in news_list:
             news_date = news.find('span').text if news.find('span') else None
-            if news_date:
+            if news_date :
                 news_url = news.find('a').get('href')
                 news_no = news_url.rsplit('/',1)[-1].replace('.html','') # http://www.caac.gov.cn/XWZX/MHYW/201607/t20160726_39146.html
                 title = news.find('a',href = re.compile('http://www.caac.gov.cn/XWZX/MHYW/')).text.strip() if news.find('a',href = re.compile('http://www.caac.gov.cn/XWZX/MHYW/')) else None
@@ -44,28 +49,32 @@ class MhywSpider(scrapy.spiders.Spider):
                 else:
                     self.flag = pageindex
             else:
-                logger.warning(" mhyw can't find news_date")
+                logger.warning("mhyw can't find news_date")
         if not self.flag:
             next_url = self.next_url % (str(pageindex + 1 ))
             yield scrapy.Request(next_url)
+
     def parse_news(self,response):
         origin_url = response.url
-        url_head = origin_url.rsplit('/',1)[0]
         item = response.meta.get('item',NewsItem())
-        soup = BeautifulSoup(response.body)
-        if soup.find('p',align="center").find('img'):
-            pic = url_head + soup.find('p',align="center").find('img').get('src')[1:]
+        if 'html' not in origin_url:
+            yield item
         else:
-            pic = None
-        referer_web = soup.find('span',class_ = 'p_r20').text().strip().split('：')[0]
-        if soup.find('p',align="left"):
-            abstract = soup.find('p',align="left").get_text(strip = True)
-        else:
-            abstract = None
-        content = [ p.get_text(strip = True) for p in soup.find_all('p',align="justify")]
-        content = '\n'.join(content)
-        item['pic'] = pic
-        item['referer_web'] = referer_web
-        item['abstract'] = abstract
-        item['content'] = content
-        yield item
+            url_head = origin_url.rsplit('/',1)[0]
+            soup = BeautifulSoup(response.body.decode('utf-8'))
+            if soup.find('p',align="center") and soup.find('p',align="center").find('img'):
+                pic = url_head + soup.find('p',align="center").find('img').get('src')[1:]
+            else:
+                pic = None
+            referer_web = soup.find('span',class_ = 'p_r20').text.strip().split(u'：')[0]
+            if soup.find('p',align="left"):
+                abstract = soup.find('p',align="left").get_text(strip = True)
+            else:
+                abstract = None
+            content = [ p.get_text(strip = True) for p in soup.find_all('p',align="justify")]
+            content = '\n'.join(content)
+            item['pic'] = pic
+            item['referer_web'] = referer_web
+            item['abstract'] = abstract
+            item['content'] = content
+            yield item
