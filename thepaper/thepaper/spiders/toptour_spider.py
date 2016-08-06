@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import logging
 from thepaper.items import NewsItem
 import json
-logger = logging.getLogger("NbdSpider")
+logger = logging.getLogger("ToptourSpider")
 from thepaper.settings import *
 from thepaper.util import judge_news_crawl
 
@@ -31,7 +31,7 @@ class ToptourSpider(scrapy.spiders.Spider):
                 item = NewsItem(
                     news_url = news_url,
                     title = title,
-                    catalogue = "右推荐"
+                    catalogue = u"右推荐"
                 )
                 yield scrapy.Request(item["news_url"],callback=self.parse_news,meta={'item':item})
         else:

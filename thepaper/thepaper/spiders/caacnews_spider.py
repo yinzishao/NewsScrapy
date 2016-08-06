@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import logging
 from thepaper.items import NewsItem
 import json
-logger = logging.getLogger("NbdSpider")
+logger = logging.getLogger("CaacnewsSpider")
 from thepaper.settings import *
 from thepaper.util import judge_news_crawl
 
