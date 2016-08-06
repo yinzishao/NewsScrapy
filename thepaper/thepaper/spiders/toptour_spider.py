@@ -14,21 +14,19 @@ from thepaper.util import judge_news_crawl
 class ToptourSpider(scrapy.spiders.Spider):
     domain = 'http://www.toptour.cn/'
     name = 'toptour'
-    allowed_domains = ['toptour.cn']
+    #allowed_domains = ['toptour.cn']
     start_urls = [
         'http://www.toptour.cn/home/'
     ]
 
-    def parse(self,response):
+    def parse(self , response):
         origin_url = response.url
-        soup = BeautifulSoup(response.body)
+        soup = BeautifulSoup(response.body,"lxml")
         temp_soup = soup.find('div',id = "ess_ctr10789_ModuleContent") if soup.find('div',id = "ess_ctr10789_ModuleContent") else None
-        print temp_soup
         if temp_soup:
             news_list = temp_soup.find_all("a" , href = re.compile("http://www.toptour.cn/tab"))
             for news in news_list:
                 news_url = news.get("href")
-                print news_url
                 title = news.text.strip()
                 item = NewsItem(
                     news_url = news_url,

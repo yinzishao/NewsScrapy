@@ -38,7 +38,11 @@ class TechIfeng(scrapy.spiders.Spider):
                 title = temp.get("title")
                 news_no = news_url.rsplit("/",1)[-1].split(".")[0]
                 abstract = news.find("p").text.strip() if news.find("p") else None
-                item = NewsItem(news_date=news_date + ":00",
+                if len(news_date) == 10:
+                    news_date = news_date + " 00:00:00"
+                else:
+                    news_date=news_date + ":00"
+                item = NewsItem(news_date=news_date,
                                 title=title,
                                 abstract=abstract,
                                 news_no=news_no,
@@ -65,8 +69,11 @@ class TechIfeng(scrapy.spiders.Spider):
         referer_web = soup.find("span",class_ = "ss03").text if soup.find("span",class_ = "ss03") else None
         author = soup.find("span",itemprop="author").find("span").text if soup.find("span",itemprop="author") else None
         temp = soup.find("div" ,id = "main_content")
-        ps = temp.find_all("p")
-        content = "\n\n".join([ p.text.strip() for p in ps])
+        if temp:
+            ps = temp.find_all("p") if temp.find_all("p") else None
+            content = "\n\n".join([ p.text.strip() for p in ps])
+        else:
+            content = None
         item['pic'] = pic
         item['referer_web'] = referer_web
         item['author'] = author
