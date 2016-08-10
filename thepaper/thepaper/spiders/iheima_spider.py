@@ -43,21 +43,22 @@ class IheimaSpider(scrapy.spiders.Spider):
                             news_url=news_url,
                             author = author
                             )
-                print title
-            item = judge_news_crawl(item)
-            if item:
-                yield scrapy.Request(item["news_url"], callback=self.parse_news, meta={"item": item})
+                item = judge_news_crawl(item)
+                if item:
+                    yield scrapy.Request(item["news_url"], callback=self.parse_news, meta={"item": item})
+                else:
+                    self.flag = pageindex
             else:
-                self.flag = pageindex
-        else:
                 logger.warning("can't find news_date")
         if not self.flag:
             if pageindex == 1:
                 next_url = self.next_url + soup.find("a" , class_ = "more").get("href")
             else:
                 next_url = self.next_url + "/?page=" + str(int(pageindex) + 1) + "&" + origin_url.split("&",1)[-1]
-            print news_url
-            yield scrapy.Request(next_url,headers={"Referer":"http://www.iheima.com/"},)
+            headers = {
+                "X-Requested-With":"XMLHttpRequest"
+                }
+            yield scrapy.Request(next_url,headers=headers,)
 
     def parse_news(self, response):
         item = response.meta.get("item", NewsItem())

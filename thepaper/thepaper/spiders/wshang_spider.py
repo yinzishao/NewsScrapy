@@ -11,9 +11,7 @@ import json
 logger = logging.getLogger("WshangSpider")
 from thepaper.settings import *
 from thepaper.util import judge_news_crawl
-"""
-网站过时，最新6/15
-"""
+#TODO:
 class NbdSpider(scrapy.spiders.Spider):
     domain = "http://i.wshang.com/"
     name = "wshang"

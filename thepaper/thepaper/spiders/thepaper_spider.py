@@ -80,8 +80,8 @@ class ThepaperSpider(scrapy.spiders.Spider):
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
         pageindex = response.meta.get("pageindex",None)
-        #TODO：新闻列表中会有专题，里面没有新闻的内容。现在是抛弃！
         soup = BeautifulSoup(response.body)
+        #TODO：新闻列表中会有专题，里面没有新闻的内容。现在是抛弃！
         #爬取新闻
         news_txt=soup.find("div",class_="news_txt")
         if news_txt:
