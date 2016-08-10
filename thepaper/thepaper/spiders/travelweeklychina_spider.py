@@ -111,6 +111,7 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
                 # 格式<p>u'XXXXX\xa0'<a>XX<\a><\p>
                 # content = unicode(news.p).replace(u'\xa0', u'').replace("<p>","").replace("</p>","")
                 #可以获取到p的内容
+                #news.p ->  \u7cfb\u5217\u6d3b\u52a8\u3002...\xa0
                 #TODO:没有replace(u'\xa0'),仍然不知出现编码问题的原因，暂不处理
                 abstract = news.p.strings.next()
 
