@@ -31,10 +31,10 @@ class TechwebSpider(scrapy.spiders.Spider):
         soup = BeautifulSoup(response.body,"lxml")
         news_list = soup.find_all("div",class_="con_one")
         for news in news_list:
-            title = news.h2.text
+            title = news.h2.get_text(strip=True)
             news_url = news.h2.a.get("href",None)
             news_no = re.search(r"/(\d+?).shtml",news_url).group(1) if re.search(r"/(\d+?).shtml",news_url) else None
-            abstract = news.p.text
+            abstract = news.p.get_text(strip=True)
             pic = news.find("img").get("src",None) if news.find("img") else None
             tags_list = news.find("span",class_="tag")("a") if news.find("span",class_="tag") else None
             tags =  [i.text for i in tags_list] if tags_list else None
@@ -77,13 +77,17 @@ class TechwebSpider(scrapy.spiders.Spider):
             else:
                 comment_num = int(comment_text)
 
-            #正文会有下一页 TODO:正文有js。
+            #正文会有下一页 TODO:正文有js，需要替换。
             content_txt = soup.find("div",class_="content_txt")
             content = content_txt.get_text(strip=True) if content_txt else None
+            referer_web = soup.find("span",id="source_baidu").a.get_text(strip=True) if soup.find("span",id="source_baidu") else None
+            referer_url = soup.find("span",id="source_baidu").a.get("href") if soup.find("span",id="source_baidu") else None
             item["content"] = content
             item["news_date"] =news_date
             item["comment_num"] =comment_num
             item["crawl_date"] =NOW
+            item["referer_web"] =referer_web
+            item["referer_url"] =referer_url
             catalogue = item["catalogue"]
             item = judge_news_crawl(item)
             if item:
