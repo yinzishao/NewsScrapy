@@ -63,6 +63,7 @@ class YicaiSpider(scrapy.spiders.Spider):
         values = self.flag.values()
         print self.flag
         yield scrapy.Request("http://m.yicai.com/news/consumer/",callback=self.parse)
+        #ugly
         if values[0] and values[1]:
             self.driver.quit()
             self.display.stop()
