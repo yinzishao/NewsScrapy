@@ -13,7 +13,7 @@ from thepaper.util import judge_news_crawl
 from pyvirtualdisplay import Display
 from selenium import webdriver
 import time
-#TODO:
+#TODO:catalogue,x消费
 
 
 # browser.get('http://www.baidu.com')
@@ -22,15 +22,20 @@ import time
 class YicaiSpider(scrapy.spiders.Spider):
     name = "yicai"
     allowed_domains = ['yicai.com']
-    start_urls = ["http://m.yicai.com/news/business/"]
-    flag = 0
+    start_urls = [
+                    "http://m.yicai.com/news/business/",
+                    # "http://m.yicai.com/news/consumer/"
+                  ]
+    flag = {"http://m.yicai.com/news/business/":0,"http://m.yicai.com/news/consumer/":0}
     def __init__(self):
         self.display = Display(visible=0, size=(800, 600))
         self.display.start()
         self.driver = webdriver.Firefox()
 
     def parse(self, response):
-        self.driver.get('http://m.yicai.com/news/business/')
+        topic_url = response.url
+        catalogue = u"商业" if "business" in topic_url else u"消费"
+        self.driver.get(topic_url)
         index_page_code = self.driver.page_source
         code =index_page_code
         pageindex = 1
@@ -43,22 +48,29 @@ class YicaiSpider(scrapy.spiders.Spider):
                 pic = news.find("img").get("src") if news.find("img") else None
                 title = news.find("h3").text if news.find("h3") else None
                 news_url = news.find("h3").a.get("href") if news.find("h3") else None
-                item = NewsItem(pic=pic,title=title,news_url=news_url)
-                yield scrapy.Request(news_url,callback=self.parse_news,meta={"item":item,"pageindex":pageindex})
+                item = NewsItem(pic=pic,title=title,news_url=news_url,catalogue=catalogue)
+                yield scrapy.Request(news_url,callback=self.parse_news,meta={"item":item,
+                                                                             "pageindex":pageindex,
+                                                                            "topic_url":topic_url})
             #触发下一页操作
-            if self.flag:
+            if self.flag[topic_url]:
                 break
             self.driver.find_element_by_id("clickMore").click()
             time.sleep(1)
             next_page_code =  self.driver.page_source
             code = next_page_code   #更新页面源代码
             pageindex += 1
-        self.driver.quit()
-        self.display.stop()
+        values = self.flag.values()
+        print self.flag
+        yield scrapy.Request("http://m.yicai.com/news/consumer/",callback=self.parse)
+        if values[0] and values[1]:
+            self.driver.quit()
+            self.display.stop()
 
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
         pageindex = response.meta.get("pageindex",1)
+        topic_url = response.meta.get("topic_url",None)
         origin_url = response.url
         news_no_res = re.search(r"news/(\d+)\.html",origin_url)
         news_no = news_no_res.group(1) if news_no_res else None
@@ -82,7 +94,7 @@ class YicaiSpider(scrapy.spiders.Spider):
         if item:
             yield item
         else:
-            self.flag=pageindex
+            self.flag[topic_url]=pageindex
 
 
 
