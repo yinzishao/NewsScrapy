@@ -13,11 +13,6 @@ from thepaper.util import judge_news_crawl
 from pyvirtualdisplay import Display
 from selenium import webdriver
 import time
-#TODO:catalogue,x消费
-
-
-# browser.get('http://www.baidu.com')
-
 
 class YicaiSpider(scrapy.spiders.Spider):
     name = "yicai"
@@ -28,15 +23,15 @@ class YicaiSpider(scrapy.spiders.Spider):
                   ]
     flag = {"http://m.yicai.com/news/business/":0,"http://m.yicai.com/news/consumer/":0}
     def __init__(self):
-        self.display = Display(visible=0, size=(800, 600))
+        self.display = Display(visible=0, size=(800, 600))  #为了隐藏浏览器
         self.display.start()
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Firefox()                   #若无display，会打开浏览器
 
     def parse(self, response):
         topic_url = response.url
         catalogue = u"商业" if "business" in topic_url else u"消费"
-        self.driver.get(topic_url)
-        index_page_code = self.driver.page_source
+        self.driver.get(topic_url)                      #打开页面
+        index_page_code = self.driver.page_source       #页面源代码
         code =index_page_code
         pageindex = 1
         interval =10
@@ -52,19 +47,22 @@ class YicaiSpider(scrapy.spiders.Spider):
                 yield scrapy.Request(news_url,callback=self.parse_news,meta={"item":item,
                                                                              "pageindex":pageindex,
                                                                             "topic_url":topic_url})
-            #触发下一页操作
+            #结束
             if self.flag[topic_url]:
                 break
-            self.driver.find_element_by_id("clickMore").click()
-            time.sleep(1)
+            #触发下一页操作，追加在页面，而不是打开一个新的页面
+            self.driver.find_element_by_id("clickMore").click()    #找到“更多”按钮，触发点击操作
+            time.sleep(1)           #等浏览器渲染
             next_page_code =  self.driver.page_source
             code = next_page_code   #更新页面源代码
             pageindex += 1
-        values = self.flag.values()
-        print self.flag
+
+        #如果放在start_urls一起爬取的话，会报错。原因应该是display不支持并行。
+        #现在只能是把每个页面分开
         yield scrapy.Request("http://m.yicai.com/news/consumer/",callback=self.parse)
-        #ugly
-        if values[0] and values[1]:
+        values = self.flag.values()
+        end_conditon = [ v for v in values if not v]    #所有的values都不是0时为[]
+        if not end_conditon:
             self.driver.quit()
             self.display.stop()
 
@@ -75,7 +73,7 @@ class YicaiSpider(scrapy.spiders.Spider):
         origin_url = response.url
         news_no_res = re.search(r"news/(\d+)\.html",origin_url)
         news_no = news_no_res.group(1) if news_no_res else None
-        soup = BeautifulSoup(response.body)
+        soup = BeautifulSoup(response.body,"lxml")
         ff3 = soup.find("h2",class_="f-ff3 f-fwn")
         referer_web = soup.find("h2",class_="f-ff3 f-fwn").i.text if ff3 else None
         #日期
