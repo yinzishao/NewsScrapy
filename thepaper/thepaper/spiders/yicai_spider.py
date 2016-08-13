@@ -36,7 +36,7 @@ class YicaiSpider(scrapy.spiders.Spider):
         pageindex = 1
         interval =10
         while True:
-            soup = BeautifulSoup(code)
+            soup = BeautifulSoup(code,"lxml")
             news_list = soup.find_all("dl",class_="f-cb")
             #页数来爬，因为每次都会有之前的新闻.间隔为10
             for news in news_list[interval*(pageindex-1):interval*pageindex]:
