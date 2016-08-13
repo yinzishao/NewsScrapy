@@ -47,7 +47,7 @@ class NbdSpider(scrapy.spiders.Spider):
                 if item:
                     yield scrapy.Request(item["news_url"],callback=self.parse_news,meta={"item":item})
                 else:
-                    self.flag= pageindex
+                    self.flag = pageindex
             else:
                 logger.warning("can't find news_date")
         if not self.flag:

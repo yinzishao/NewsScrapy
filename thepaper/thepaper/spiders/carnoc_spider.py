@@ -15,7 +15,7 @@ class CarnocSpider(scrapy.spiders.Spider):
     domain = "http://news.carnoc.com/"
     name = "carnoc"
     allowed_domains = ["news.carnoc.com",]
-    flag = 0
+    flag = {}
     start_urls = [
         "http://news.carnoc.com/cache/list/news_hotlist_1.html",
         "http://news.carnoc.com/cache/list/news_intelist_1.html",
@@ -30,6 +30,14 @@ class CarnocSpider(scrapy.spiders.Spider):
 
     def parse(self,response):
         origin_url = response.url
+        topic_url = origin_url.split("_",1)[1].rsplit("_",1)[0]
+        self.flag.setdefault(topic_url,0)
+        yield scrapy.Request(origin_url,callback=self.parse_topic)
+
+
+    def parse_topic(self,response):
+        origin_url = response.url
+        topic_url = origin_url.split("_",1)[1].rsplit("_",1)[0]
         pageindex = int(origin_url.rsplit("_",1)[1].replace('.html',''))
         catalogue = re.search('</a> -&gt; ([\w\W]+?) </i></h3>',response.body).group(1).decode("gb2312")
         soup = BeautifulSoup(response.body,"lxml")
@@ -57,12 +65,12 @@ class CarnocSpider(scrapy.spiders.Spider):
                 if item:
                     yield scrapy.Request(item["news_url"],callback=self.parse_news,meta={'item':item})
                 else:
-                    self.flag = pageindex
+                    self.flag[topic_url] = pageindex
             else:
                 logger.warning("carnoc:%s can't find news_date " % origin_url)
-        if not self.flag:
-            next_url = origin_url.rsplit("_",1)[-1] + '_' + str(pageindex + 1) + '.html'
-            yield scrapy.Request(next_url)
+        if not self.flag[topic_url]:
+            next_url = origin_url.rsplit("_",1)[0] + '_' + str(pageindex + 1) + '.html'
+            yield scrapy.Request(next_url,callback=self.parse_topic)
 
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
