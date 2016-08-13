@@ -1,9 +1,9 @@
 # NewsScrapy
 基于scrapy、selenium、beautifulsoup、pyvirtualdisplay的新闻爬虫
 
-##一财网：js生成cookie；
-##中国经营报，直接访问会报521错误，js生成cookie后重定向才能得到首页，phantomjs并不能解决这个重定向。
-##但Firefox可以解决，为了不让浏览器打开，用了headless-firefox。具体教程参考：http://scraping.pro/use-headless-firefox-scraping-linux/		**使用selenium和scrapy结合代码可看yicai_spider.py**
+###一财网：js生成cookie；
+###中国经营报，直接访问会报521错误，js生成cookie后重定向才能得到首页，phantomjs并不能解决这个重定向。
+###但Firefox可以解决，为了不让浏览器打开，用了headless-firefox。具体教程参考：http://scraping.pro/use-headless-firefox-scraping-linux/		**使用selenium和scrapy结合代码可看yicai_spider.py**
 
 包括列表有：
 
