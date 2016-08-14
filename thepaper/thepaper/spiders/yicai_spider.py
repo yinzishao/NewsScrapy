@@ -60,11 +60,11 @@ class YicaiSpider(scrapy.spiders.Spider):
         #如果放在start_urls一起爬取的话，会报错。原因应该是display不支持并行。
         #现在只能是把每个页面分开
         yield scrapy.Request("http://m.yicai.com/news/consumer/",callback=self.parse)
-        values = self.flag.values()
-        end_conditon = [ v for v in values if not v]    #所有的values都不是0时为[]
-        if not end_conditon:
-            self.driver.quit()
-            self.display.stop()
+        # values = self.flag.values()
+        # end_conditon = [ v for v in values if not v]    #所有的values都不是0时为[]
+        # if not end_conditon:
+        #     self.driver.quit()
+        #     self.display.stop()
 
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
@@ -95,6 +95,9 @@ class YicaiSpider(scrapy.spiders.Spider):
         else:
             self.flag[topic_url]=pageindex
 
+    def close(self, reason):
+        self.driver.quit()
+        self.display.stop()
 
 
 
