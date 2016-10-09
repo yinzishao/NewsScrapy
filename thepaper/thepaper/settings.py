@@ -136,7 +136,7 @@ PROXIES=[
     {'ip_port': '122.224.249.122:8088', 'user_pass': ''},
 ]
 
-END_DAY = 1
+END_DAY = 3
 #爬取新闻的×天前的相对时间，默认当天凌晨。也就是爬取当天凌晨的×天前的新闻
 END_NOW = datetime.datetime.combine(datetime.date.today(), datetime.time.min) #当天0点
 # END_NOW = datetime.datetime.now() #当时

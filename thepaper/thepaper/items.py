@@ -32,3 +32,4 @@ class NewsItem(scrapy.Item):
     topic = scrapy.Field()      #所在网站所属主题
     catalogue = scrapy.Field()  #所在网站所属目录
     tags = scrapy.Field()       #标签
+    keywords = scrapy.Field()   #找到对应的关键词

@@ -9,7 +9,7 @@ from thepaper.items import NewsItem
 import json
 logger = logging.getLogger("NbdSpider")
 from thepaper.settings import *
-from thepaper.util import judge_news_crawl
+from thepaper.util import judge_news_crawl,judge_key_words
 import time
 
 class TechQQSpider(scrapy.spiders.Spider):
@@ -97,4 +97,7 @@ class TechQQSpider(scrapy.spiders.Spider):
         item["comment_num"] = comment_num
         item["content"] = content
         item['crawl_date'] = NOW
-        yield item
+        item_keywords = judge_key_words(item)  #获得item和关键词匹配的词
+        if item_keywords:   #筛选出有关键词的item
+            item["keywords"] = item_keywords
+            yield item

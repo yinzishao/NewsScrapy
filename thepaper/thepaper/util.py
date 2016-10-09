@@ -5,6 +5,12 @@ __author__ = 'yinzishao'
 import time
 import datetime
 from thepaper.settings import *
+import jieba
+jieba.load_userdict("keywords.txt")
+
+
+with open("keywords.txt") as f : keywords  = [ line.strip().split(" ")[0].decode("utf-8") for line in f.readlines()]
+f.close()
 """
     判断传入的时间是否是当天
     request：
@@ -30,3 +36,24 @@ def judge_news_crawl(item,end_day=END_DAY):
         else:
             return None
     return None
+
+
+def judge_key_words(item):
+    item_keywords = []
+    title = item.get("title",None)
+    content = item.get("content",None)
+    if title:
+        words = jieba.cut(title)
+        for w in words:
+            if w in keywords:
+                item_keywords.append(w)
+    if content:
+        words = jieba.cut(content)
+        for w in keywords:
+            if w in words:
+                item_keywords.append(w)
+    if len(item_keywords) > 0:
+        item_keywords = list(set(item_keywords))
+        return item_keywords
+    else:
+        return None
