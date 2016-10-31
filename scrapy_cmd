@@ -1,3 +1,6 @@
+pip 镜像：https://pypi.tuna.tsinghua.edu.cn/simple
+pip install XXX -i https://pypi.tuna.tsinghua.edu.cn/simple
+sudo apt-get install python-scrapy
 
 scrapy startproject peojectname
 
