@@ -8,6 +8,7 @@
 
 import json
 import pymongo
+from util import judge_key_words
 
 class JsonWriterPipeline(object):
 
@@ -15,6 +16,9 @@ class JsonWriterPipeline(object):
         self.file = open('items.jl', 'wb')
 
     def process_item(self, item, spider):
+        item_keywords = judge_key_words(item)#获得item和关键词匹配的词
+        if item_keywords:   #筛选出有关键词的item
+            item["keywords"] = item_keywords
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
         return item
