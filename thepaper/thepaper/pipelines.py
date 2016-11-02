@@ -13,7 +13,7 @@ from util import judge_key_words
 class JsonWriterPipeline(object):
 
     def __init__(self):
-        self.file = open('items.jl', 'wb')
+        self.file = open('items.txt', 'wb')
 
     def process_item(self, item, spider):
         item_keywords = judge_key_words(item)#获得item和关键词匹配的词
@@ -23,10 +23,24 @@ class JsonWriterPipeline(object):
         self.file.write(line)
         return item
 
+'''
+确定关键词
+'''
+class selectKeywordPipeline(object):
 
+    def process_item(self, item, spider):
+        item_keywords = judge_key_words(item)#获得item和关键词匹配的词
+        if item_keywords:   #筛选出有关键词的item
+            item["keywords"] = item_keywords
+
+        return item
+
+'''
+存放数据库
+'''
 class MongoPipeline(object):
 
-    collection_name = 'scrapy_items'
+    collection_name = 'news'
 
     def __init__(self, mongo_uri, mongo_db):
         self.mongo_uri = mongo_uri

@@ -66,7 +66,9 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'thepaper.pipelines.JsonWriterPipeline': 300,
+   'thepaper.pipelines.selectKeywordPipeline': 300,
+   'thepaper.pipelines.MongoPipeline': 301,
+
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -141,5 +143,11 @@ END_DAY = 3
 END_NOW = datetime.datetime.combine(datetime.date.today(), datetime.time.min) #当天0点
 # END_NOW = datetime.datetime.now() #当时
 NOW = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") #现在时间的格式
+
+#MongoDB URI
+MONGO_URI = 'mongodb://localhost:27017/'
+
+#MongoDB databases
+MONGO_DATABASE = 'News'
 
 HTTPERROR_ALLOWED_CODES= [521]
