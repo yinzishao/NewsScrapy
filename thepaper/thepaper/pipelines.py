@@ -8,6 +8,7 @@
 
 import json
 import pymongo
+import logging
 from settings import SPIDER_NAME
 from util import judge_key_words
 from scrapy.exceptions import DropItem
@@ -36,6 +37,8 @@ class selectKeywordPipeline(object):
             item["keywords"] = item_keywords
             return item
         else:
+            logger = logging.getLogger(spider.name)
+            logger.info("No keyword in %s" % item["news_url"])
             raise DropItem("No keyword in %s" % item["news_url"])
 
 '''

@@ -182,3 +182,5 @@ SPIDER_NAME = {
 }
 
 LOG_LEVEL = "INFO"
+
+LOG_FORMATTER = 'thepaper.polite_log_formatter.PoliteLogFormatter'
