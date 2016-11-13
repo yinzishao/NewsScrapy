@@ -33,3 +33,5 @@ class NewsItem(scrapy.Item):
     catalogue = scrapy.Field()  #所在网站所属目录
     tags = scrapy.Field()       #标签
     keywords = scrapy.Field()   #找到对应的关键词
+    source = scrapy.Field()     #来源网站(网易科技)
+    

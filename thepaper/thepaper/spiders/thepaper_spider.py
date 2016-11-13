@@ -80,7 +80,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
         pageindex = response.meta.get("pageindex",None)
-        soup = BeautifulSoup(response.body)
+        soup = BeautifulSoup(response.body, "lxml")
         #TODO：新闻列表中会有专题，里面没有新闻的内容。现在是抛弃！
         #爬取新闻
         news_txt=soup.find("div",class_="news_txt")
@@ -117,7 +117,7 @@ class ThepaperSpider(scrapy.spiders.Spider):
         for news in news_list:
             if news.has_attr("lasttime"):break  #首页出现的特殊异常
             item = NewsItem()
-
+            item["catalogue"] = "精选内容"      #目录
             item["title"] = news.h2.a.string    #题目
             item["news_url"] = self.domain+news.h2.a.get("href") #新闻链接
             item["abstract"] = news.p.string     #简介

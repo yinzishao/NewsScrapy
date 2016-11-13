@@ -151,3 +151,32 @@ MONGO_URI = 'mongodb://localhost:27017/'
 MONGO_DATABASE = 'News'
 
 HTTPERROR_ALLOWED_CODES= [521]
+
+#spider's name 和网站的对应关系
+SPIDER_NAME = {
+    "carnoc": "民航资源网",
+    "caacnews": "中国民航报",
+    "mhyw": "中国民用航空网",
+    "cntour2": "中国旅游新闻网",
+    "toptour": "第一旅游网",
+    "cnta":"国家旅游局",
+    "iheima":"i黑马",
+    "36kr": "36氪",
+    "donews": "Donews",
+    "techweb": "Techweb",
+    "thepaper": "澎湃新闻",
+    "jiemian": "界面新闻",
+    "wshang": "天下网商",
+    "nbd": "每日经济",
+    "yicai": "一财网",
+    "money163": "网易财经",
+    "cyzone": "创业邦",
+    "leiphone": "雷锋网",
+    "cb": "中国经营报",
+    "luxe": "华丽志",
+    "wallstreetcn": "华尔街见闻",
+    "qdaily": "好奇心日报",
+    "twc": "Travel weekly China",
+    "meadin": "迈点网",
+    "ctcnn": "劲旅网"
+}

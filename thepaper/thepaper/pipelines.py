@@ -8,7 +8,9 @@
 
 import json
 import pymongo
+from settings import SPIDER_NAME
 from util import judge_key_words
+from scrapy.exceptions import DropItem
 
 class JsonWriterPipeline(object):
 
@@ -32,8 +34,9 @@ class selectKeywordPipeline(object):
         item_keywords = judge_key_words(item)#获得item和关键词匹配的词
         if item_keywords:   #筛选出有关键词的item
             item["keywords"] = item_keywords
-
-        return item
+            return item
+        else:
+            raise DropItem("No keyword in %s" % item["news_url"])
 
 '''
 存放数据库
@@ -61,5 +64,6 @@ class MongoPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
+        item['source'] = SPIDER_NAME[spider.name]
         self.db[self.collection_name].insert(dict(item))
         return item
