@@ -1,0 +1,11 @@
+#{PROJECT_PATH} 为项目的路径 eg:/home/youmi/project/NewsScrapy/thepaper
+#每天早上8点爬取数据
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl thepaper -o log/thepaper.json --logfile log/thepaper.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl meadin -o log/meadin.json --logfile log/meadin.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl ctcnn -o log/ctcnn.json --logfile log/ctcnn.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl qdaily -o log/qdaily.json --logfile log/qdaily.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl twc -o log/twc.json --logfile log/twc.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl leiphone -o log/leiphone.json --logfile log/leiphone.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl cyzone -o log/cyzone.json --logfile log/cyzone.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl 163 -o log/163.json --logfile log/163.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl wallstreetcn -o log/wallstreetcn.json --logfile log/wallstreetcn.log
