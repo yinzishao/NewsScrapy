@@ -180,3 +180,5 @@ SPIDER_NAME = {
     "meadin": "迈点网",
     "ctcnn": "劲旅网"
 }
+
+LOG_LEVEL = "INFO"

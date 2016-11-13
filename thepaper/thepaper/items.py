@@ -34,4 +34,3 @@ class NewsItem(scrapy.Item):
     tags = scrapy.Field()       #标签
     keywords = scrapy.Field()   #找到对应的关键词
     source = scrapy.Field()     #来源网站(网易科技)
-    

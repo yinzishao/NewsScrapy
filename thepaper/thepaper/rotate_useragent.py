@@ -29,7 +29,7 @@ class RotateUserAgentMiddleware(UserAgentMiddleware):
 
             #记录
             logger = logging.getLogger('USerAgent')
-            logger.info('Current UserAgent:%s' % ua)
+            logger.debug('Current UserAgent:%s' % ua)
             #旧版
             # log.msg('Current UserAgent: '+ua, level='INFO')
             request.headers.setdefault('User-Agent', ua)
