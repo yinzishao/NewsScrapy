@@ -6,7 +6,8 @@ __pycache__/
 thepaper/log/
 # C extensions
 *.so
-
+# 隐藏文件
+thepaper/.*
 # Distribution / packaging
 .Python
 env/
