@@ -109,5 +109,5 @@ class LuxeSpider(scrapy.spiders.Spider):
         news_content_group.find("div",class_="related_posts").replace_with("")
         content = news_content_group.text.strip()
         item["content"] = content
+        item["catalogue"] = u"最新内容"
         yield item
-

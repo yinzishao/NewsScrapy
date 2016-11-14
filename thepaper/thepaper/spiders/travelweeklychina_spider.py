@@ -178,5 +178,5 @@ class TravelWeeklyChinaSpider(scrapy.spiders.Spider):
                 item = NewsItem(title=title,topic=topic,
                                 abstract=abstract,news_date=news_date,
                                 content=content,news_no=news_no
-                                ,crawl_date=NOW,news_url=response.url,)
+                                ,crawl_date=NOW,news_url=response.url,catalogue='新闻板块')
                 yield item

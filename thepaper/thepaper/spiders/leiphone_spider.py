@@ -12,6 +12,9 @@ import json
 logger = logging.getLogger("LeiphoneSpider")
 from thepaper.settings import *
 class LeiphoneSpider(scrapy.spiders.Spider):
+    """
+    最新文章包括顶部推荐，和精选导读
+    """
     domain = "http://www.leiphone.com"
     name = "leiphone"
     allowed_domains = ["leiphone.com",]
@@ -62,12 +65,7 @@ class LeiphoneSpider(scrapy.spiders.Spider):
         item = response.meta.get("item",NewsItem())
         soup = BeautifulSoup(response.body)
         content = soup.find("div",class_=re.compile(r"pageCont")).text if soup.find("div",class_=re.compile(r"pageCont")) else None
-        item["crawl_date"]=NOW
-        item["content"] =content
+        item["crawl_date"]= NOW
+        item["content"] = content
+        item["catalogue"] = u"最新资讯"
         yield item
-
-
-
-
-
-

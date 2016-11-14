@@ -18,6 +18,9 @@ from thepaper.settings import *
 from thepaper.util import judge_news_crawl
 #TODO:
 class NbdSpider(scrapy.spiders.Spider):
+    """
+    最新文章包括顶部推荐
+    """
     domain = "http://m.iwshang.com/"
     name = "wshang"
     # allowed_domains = ["i.wshang.com",]
@@ -133,8 +136,5 @@ class NbdSpider(scrapy.spiders.Spider):
         item["author"] = author
         item["content"] = content
         item["crawl_date"] = NOW
+        item["catalogue"] = u"最新内容"
         yield item
-
-
-
-

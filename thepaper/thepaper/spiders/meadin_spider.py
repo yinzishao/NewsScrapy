@@ -54,7 +54,7 @@ class MeadinSpider(scrapy.spiders.Spider):
                     topic=None
 
 
-                item = NewsItem(title=title,news_url=news_url,abstract=abstract,pic=pic,topic=topic,news_date=news_date)
+                item = NewsItem(title=title,news_url=news_url,abstract=abstract,pic=pic,topic=topic,news_date=news_date,catalogue=u"咨询")
                 request = scrapy.Request(news_url,callback=self.parse_news)
                 request.meta['item']=item
                 request.meta['pageindex']=index

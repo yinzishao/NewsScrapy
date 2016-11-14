@@ -80,10 +80,9 @@ class Wallstreetcn(scrapy.spiders.Spider):
         item["news_date"]=news_date
         item["crawl_date"]=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         item["news_no"] = news_no
+        item["catalogue"] = u"最新文章"
         item = judge_news_crawl(item)   #判断是否符合爬取时间
         if item:
             yield item
         else:
             self.flag= pageindex
-
-
