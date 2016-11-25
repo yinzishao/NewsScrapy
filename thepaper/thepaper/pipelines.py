@@ -12,6 +12,7 @@ import logging
 from settings import SPIDER_NAME
 from util import judge_key_words
 from scrapy.exceptions import DropItem
+from bson.objectid import ObjectId
 
 class JsonWriterPipeline(object):
 
@@ -68,5 +69,6 @@ class MongoPipeline(object):
 
     def process_item(self, item, spider):
         item['source'] = SPIDER_NAME[spider.name]
+        item['_id'] = str(ObjectId())
         self.db[self.collection_name].insert(dict(item))
         return item

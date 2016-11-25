@@ -16,6 +16,7 @@ class ThepaperItem(scrapy.Item):
 新闻(标题,摘要,正文,url,发布时间,爬从抓取的时间,引用的网站名,引用的源url,作者,已阅读量,已评论量,新闻图片,所在网站的新闻标号,所在网站所属目录)
 """
 class NewsItem(scrapy.Item):
+    _id = scrapy.Field()        #id
     title = scrapy.Field()      #标题
     abstract = scrapy.Field()   #摘要
     news_date = scrapy.Field()  #发布时间
