@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from bson.objectid import ObjectId
-
+from django.views.decorators.csrf import csrf_exempt
 client = pymongo.MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DATABASE]
 newsCol = db['news']    #新闻集合
@@ -130,7 +130,7 @@ def getKeywords(request):
     获取关键词
     :param request:
         {
-            "start":0.
+            "start":0,
             "size":6
         }
     :return:
@@ -158,6 +158,8 @@ def getKeywords(request):
     resultList = list(newsCol.aggregate(pipeline))
     return Response(resultList[start:size])
 
+
+
 @api_view(['GET','POST'])
 def getNewsByKey(request):
     """
@@ -179,7 +181,6 @@ def getNewsByKey(request):
         keyword = request.data['_id']
     resultList = list(newsCol.find({"keywords": keyword},{"_id": 0}))
     return Response(resultList)
-
 class News(APIView):
     def get(self, request, format = None):
         data = db['news'].find_one({},{'_id':0})

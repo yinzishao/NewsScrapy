@@ -19,12 +19,12 @@ from api import views
 from rest_framework.urlpatterns import format_suffix_patterns
 urlpatterns = [
     url(r'^$', views.index),
-    url(r'^getNews/(?P<id>.+)/$', views.getNews),
-    url(r'^getSource/$', views.getSource),
-    url(r'^getCatalogue/$', views.getCatalogue),
-    url(r'^getNewsList/$', views.getNewsList),
-    url(r'^getKeywords/$', views.getKeywords),
-    url(r'^getNewsByKey/$', views.getNewsByKey),
+    url(r'^getNews/(?P<id>.+)', views.getNews),
+    url(r'^getSource', views.getSource),
+    url(r'^getCatalogue', views.getCatalogue),
+    url(r'^getNewsList', views.getNewsList),
+    url(r'^getKeywords', views.getKeywords),
+    url(r'^getNewsByKey', views.getNewsByKey),
     url(r'^news/$', views.News.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
