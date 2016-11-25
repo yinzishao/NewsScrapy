@@ -108,3 +108,4 @@ MONGO_URI = 'mongodb://localhost:27017/'
 
 #MongoDB databases
 MONGO_DATABASE = 'News'
+
