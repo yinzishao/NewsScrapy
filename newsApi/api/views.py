@@ -115,8 +115,7 @@ def getNews(request, id):
     :return: News Item
 
     """
-    news = newsCol.find_one({'_id': ObjectId('5828343ffb6f8974f6b97794')})
-    news['_id'] = str(news['_id'])
+    news = newsCol.find_one({'_id': id})
     return Response(news)
 
 @api_view(['GET','POST'])
