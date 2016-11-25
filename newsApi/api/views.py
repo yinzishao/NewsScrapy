@@ -26,11 +26,8 @@ def index(request):
     :return:
     """
     if request.method == 'GET':
-        data = newsCol.find_one({},{'_id':0})
-        # data['_id'] = data['_id'].toString()
-        # print data
+        data = newsCol.find_one({})
         return Response(data)
-        return HttpResponse(u"欢迎光临 自强学堂!")
 
 
 @api_view(['GET', 'POST'])
@@ -101,15 +98,13 @@ def getNewsList(request):
     :return:
         news items list
     """
-    print request.data
     source = request.data['source']
     catalogue = request.data['catalogue']
     size = request.data['size']
     start = request.data['start'] * size
     #获取新闻的简要信息
-    data = newsCol.find({"source": source, "catalogue": catalogue}, {"_id": 0}).skip(start).limit(size)
+    data = newsCol.find({"source": source, "catalogue": catalogue}).skip(start).limit(size)
     resultList = list(data)
-    print resultList
     return Response(resultList)
 
 @api_view(['GET'])
@@ -179,13 +174,10 @@ def getNewsByKey(request):
         size = request.data['size']
         start = request.data['start'] * size
         keyword = request.data['_id']
-    resultList = list(newsCol.find({"keywords": keyword},{"_id": 0}))
+    resultList = list(newsCol.find({"keywords": keyword}))
     return Response(resultList)
 class News(APIView):
     def get(self, request, format = None):
-        data = db['news'].find_one({},{'_id':0})
-        # data['_id'] = data['_id'].toString()
-        # print data
+        data = db['news'].find_one({})
         return Response(data)
-        return HttpResponse(u"欢迎光临 自强学堂!")
 
