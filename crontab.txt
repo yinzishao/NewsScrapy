@@ -1,11 +1,29 @@
 #{PROJECT_PATH} 为项目的路径 eg:/home/youmi/project/NewsScrapy/thepaper
 #每天早上8点爬取数据
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl carnoc -o log/carnoc.json --logfile log/carnoc.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl caacnews -o log/caacnews.json --logfile log/caacnews.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl mhyw -o log/mhyw.json --logfile log/mhyw.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl money163 -o log/money163.json --logfile log/money163.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl toptour -o log/toptour.json --logfile log/toptour.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl cnta -o log/cnta.json --logfile log/cnta.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl tech_ifeng -o log/tech_ifeng.json --logfile log/tech_ifeng.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl techqq -o log/techqq.json --logfile log/techqq.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl tech163 -o log/tech163.json --logfile log/tech163.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl tmtpost -o log/tmtpost.json --logfile log/tmtpost.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl iheima -o log/iheima.json --logfile log/iheima.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl 36kr -o log/36kr.json --logfile log/36kr.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl donews -o log/donews.json --logfile log/donews.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl thepaper -o log/thepaper.json --logfile log/thepaper.log
-0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl meadin -o log/meadin.json --logfile log/meadin.log
-0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl ctcnn -o log/ctcnn.json --logfile log/ctcnn.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl jiemian -o log/jiemian.json --logfile log/jiemian.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl wshang -o log/wshang.json --logfile log/wshang.log
+#0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl nbd -o log/nbd.json --logfile log/nbd.log
+#0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl yicai -o log/yicai.json --logfile log/yicai.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl cyzone -o log/cyzone.json --logfile log/cyzone.log
+#0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl leiphone -o log/leiphone.json --logfile log/leiphone.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl luxe -o log/luxe.json --logfile log/luxe.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl wallstreetcn -o log/wallstreetcn.json --logfile log/wallstreetcn.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl qdaily -o log/qdaily.json --logfile log/qdaily.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl twc -o log/twc.json --logfile log/twc.log
-0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl leiphone -o log/leiphone.json --logfile log/leiphone.log
-0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl cyzone -o log/cyzone.json --logfile log/cyzone.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl meadin -o log/meadin.json --logfile log/meadin.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl ctcnn -o log/ctcnn.json --logfile log/ctcnn.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl 163 -o log/163.json --logfile log/163.log
-0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl wallstreetcn -o log/wallstreetcn.json --logfile log/wallstreetcn.log

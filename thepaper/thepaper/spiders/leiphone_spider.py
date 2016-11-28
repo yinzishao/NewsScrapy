@@ -28,7 +28,7 @@ class LeiphoneSpider(scrapy.spiders.Spider):
     def parse(self, response):
         url = response.url
         pageindex = url.rsplit("/",1)[-1]
-        soup = BeautifulSoup(response.body)
+        soup = BeautifulSoup(response.body, "lxml")
         wrap = soup.find("div",class_="wrap")
         news_list = wrap.find_all("li",class_="pbox clr")
         for news in news_list:

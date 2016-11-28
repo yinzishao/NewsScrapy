@@ -122,3 +122,16 @@ http://www.cb.com.cn/opinion/
 http://www.nbd.com.cn/
 
 页面改版，需重新定义需求
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+中国民用航空网:
+没有内容
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/logging/__init__.py", line 884, in emit
+    stream.write(fs % msg.encode("UTF-8"))
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xef in position 1086: ordinal not in range(128)
+Logged from file scraper.py, line 158
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+news_content_group.find("div",class_="related_posts").replace_with("")
+AttributeError: 'NoneType' object has no attribute 'find'
