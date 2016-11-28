@@ -29,43 +29,45 @@ class LeiphoneSpider(scrapy.spiders.Spider):
         url = response.url
         pageindex = url.rsplit("/",1)[-1]
         soup = BeautifulSoup(response.body, "lxml")
-        wrap = soup.find("div",class_="wrap")
-        news_list = wrap.find_all("li",class_="pbox clr")
+        wrap = soup.find("div",class_="lph-pageList index-pageList")
+        news_list = wrap.find_all("li")
         for news in news_list:
-            origin_date =news.find("div",class_="time").text.strip()
-            struct_date= datetime.datetime.strptime(origin_date,"%Y / %m / %d\n%H:%M")
-            news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
-            # if not self.flag or self.flag == pageindex:
             topic = news.find("div",class_="img").a.string.strip() if news.find("div",class_="img") else None
-            pic = news.find("img").get("src",None) if news.find("img") else None
-            title = news.find("div",class_="tit").string if news.find("div",class_="tit") else None
-            abstract = news.find("div",class_="des").string if news.find("div",class_="des") else None
-            author = news.find("div",class_="aut").text.strip() if news.find("div",class_="aut") else None
-            news_url = news.find("div",class_="tit").parent.get("href") if news.find("div",class_="tit") else None
-            comment_num = news.find("a",class_="cmt").text if news.find("a",class_="cmt") else None
+            pic = news.find("img").get("data-original",None) if news.find("img") else None
+            title = news.find("h3").text.strip() if news.find("h3") else None
+            abstract = news.find("div",class_="des").text.strip() if news.find("div",class_="des") else None
+            author = news.find("a",class_="aut").text.strip() if news.find("a",class_="aut") else None
+            news_url = news.find("h3").a.get("href") if news.find("h3") else None
+            tag_list = news.find("div", class_="tags").find_all("a")
+            tags = [i.text for i in tag_list] if tag_list else None
             item = NewsItem(topic=topic,
                             news_url=news_url,
                             pic=pic,
                             title=title,
                             abstract=abstract,
                             author=author,
-                            comment_num=comment_num,
-                            news_date=news_date)
-            item = judge_news_crawl(item)
-            if item:
-                request = scrapy.Request(news_url,meta={"item":item},callback=self.parse_news)
-                yield request
-            else:
-                self.flag =int(pageindex)
+                            tags=tags,
+                            )
+            request = scrapy.Request(news_url,meta={"item":item,"pageindex":pageindex},callback=self.parse_news)
+            yield request
         if not self.flag:
             pageindex = int(pageindex)+1
             next_url = self.next_url % pageindex
             yield scrapy.Request(next_url)
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
-        soup = BeautifulSoup(response.body)
-        content = soup.find("div",class_=re.compile(r"pageCont")).text if soup.find("div",class_=re.compile(r"pageCont")) else None
+        pageindex = response.meta.get("pageindex",1)
+        soup = BeautifulSoup(response.body, 'lxml')
+        origin_date = soup.find("td", class_="time").text.strip()
+        struct_date= datetime.datetime.strptime(origin_date,"%Y-%m-%d %H:%M")
+        news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
+        content = soup.find("div", class_= "lph-article-comView").text.strip() if soup.find("div", class_= "lph-article-comView").text.strip() else None
+        item["news_date"]= news_date
         item["crawl_date"]= NOW
         item["content"] = content
         item["catalogue"] = u"最新资讯"
-        yield item
+        item = judge_news_crawl(item)
+        if item:
+            yield item
+        else:
+            self.flag = int(pageindex)
