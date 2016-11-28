@@ -135,3 +135,5 @@ Logged from file scraper.py, line 158
 ----------------------------------------------------------------------------------------------
 news_content_group.find("div",class_="related_posts").replace_with("")
 AttributeError: 'NoneType' object has no attribute 'find'
+
+https://api.wallstreetcn.com/v2/pcarticles?page=2&limit=20&category=most-recent&articleCursor=1480291201
