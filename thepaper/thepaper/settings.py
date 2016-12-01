@@ -182,7 +182,8 @@ SPIDER_NAME = {
     "qdaily": "好奇心日报",
     "twc": "Travel weekly China",
     "meadin": "迈点网",
-    "ctcnn": "劲旅网"
+    "ctcnn": "劲旅网",
+    "wechat": "微信公众号"
 }
 
 LOG_LEVEL = "INFO"

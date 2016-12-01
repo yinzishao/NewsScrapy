@@ -70,5 +70,6 @@ class MongoPipeline(object):
     def process_item(self, item, spider):
         item['source'] = SPIDER_NAME[spider.name]
         item['_id'] = str(ObjectId())
-        self.db[self.collection_name].insert(dict(item))
+        collection_name = "wechat" if spider.name == "wechat" else self.collection_name
+        self.db[collection_name].insert(dict(item))
         return item
