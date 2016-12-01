@@ -17,18 +17,20 @@ class WechatSpider(scrapy.spiders.Spider):
     """
     获取微信公众号的文章
     """
-    #TODO:多个微信公众号
-    weixin_id = "icarnoc"
     name = "wechat"
-    start_urls = [
-        "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=y&_sug_type_=" % weixin_id
-    ]
 
+    def start_requests(self):
+        for weixin_id in WECHAT_IDS[8:9]:
+            url = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=y&_sug_type_=" % weixin_id
+            print url
+            yield scrapy.Request(url, self.parse, meta= {"weixin_id":weixin_id})
+    #TODO:BUG
     def parse(self, response):
+        weixin_id = response.meta.get("weixin_id", None)
         soup = BeautifulSoup(response.body,"lxml")
         url = soup.find("a",uigs="main_toweixin_account_image_0").get("href")   #获得公众号的主页
         name =  soup.find("a",uigs="main_toweixin_account_name_0").text.strip()
-        yield scrapy.Request(url, callback=self.parse_index, meta={"name":name})
+        yield scrapy.Request(url, callback=self.parse_index, meta={"name":name, "weixin_id": weixin_id})
 
     def parse_index(self, response):
         """
@@ -36,7 +38,7 @@ class WechatSpider(scrapy.spiders.Spider):
         :param response:    公众号主页
         :return:
         """
-        weixin_id = "icarnoc"
+        weixin_id = response.meta.get("weixin_id", None)
         msg = re.search(r"var msgList =([\W\w]+?)seajs.use",response.body).group(1).strip()[:-1]  # 获得公众号的文章列表
         msg_dict = json.loads(msg)
         weixin_name = response.meta.get("name", None)

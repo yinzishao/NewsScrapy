@@ -186,6 +186,38 @@ SPIDER_NAME = {
     "wechat": "微信公众号"
 }
 
+WECHAT_IDS = [
+    "caacnews-official",
+    "liwuli_hotels",
+    "travelskygds",
+    "ThingsOfAirlines",
+    "icarnoc",
+    "bvmagazine",
+    "wow36kr",
+    "huxiu_com",
+    "guifabucom",
+    "pinchain",
+    "wepingwest",
+    "GP4008202018",
+    "ctcnn1",
+    "dotours",
+    "meadin1",
+    "thepapernews",
+    "qqtech",
+    "zglybs",
+    "lvjienews",
+    "ph1240888257",
+    "B1-12F",
+    "BBTtravel",
+    "LuxeCO",
+    "otadaily",
+    "ehotelier",
+]
+
+WECHAT_NAME = {
+    "caacnews-officials": "中国民航网",
+}
+
 LOG_LEVEL = "INFO"
 
 LOG_FORMATTER = 'thepaper.polite_log_formatter.PoliteLogFormatter'
