@@ -15,8 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 client = pymongo.MongoClient(settings.MONGO_URI)
 db = client[settings.MONGO_DATABASE]
 newsCol = db['news']    #新闻集合
-
-##TODO:修改_id类型
+wechatCol = db['wechat'] #微信公众号集合
 
 @api_view(['GET'])
 def index(request):
@@ -150,7 +149,7 @@ def getKeywords(request):
         "$group": {"_id": "$keywords", "count": {"$sum": 1}}
     }]
     resultList = list(newsCol.aggregate(pipeline))
-    return Response(resultList[start:size])
+    return Response(resultList[start: start + size])
 
 
 
@@ -174,7 +173,66 @@ def getNewsByKey(request):
         start = request.data['start'] * size
         keyword = request.data['_id']
     resultList = list(newsCol.find({"keywords": keyword}))
+    return Response(resultList[start : start + size])
+
+
+@api_view(['GET','POST'])
+def getWechatSource(request):
+    """
+    获取公众号来源列表
+    :param request:
+        {
+            "start": 0,
+            "size": 6
+        }
+    :return:
+        [
+            {
+                "count": number,
+                "_id": string
+            }
+        ]
+    """
+    pipeline = [{"$group": {"_id": "$weixin_name", "count": {"$sum": 1}}}]
+    data = wechatCol.aggregate(pipeline)
+    resultList = []
+    if request.method == 'GET':
+        resultList = list(data)
+    elif request.method == 'POST':
+        size = request.data['size']
+        start = request.data['start'] * size
+        resultList = list(data)[start : start + size]
     return Response(resultList)
+
+@api_view(['POST'])
+def getWechatList(request):
+    """
+    获取某个公众号的文章列表
+    :param request:
+        {
+            "start": 0,
+            "size": 6,
+            "weixin_name": "虎嗅网"
+        }
+    :return:
+        wechat items list
+    """
+    size = request.data['size']
+    weixin_name = request.data['weixin_name']
+    start = request.data['start'] * size
+    data = wechatCol.find({'weixin_name' : weixin_name}).skip(start).limit(size)
+    return Response(list(data))
+
+@api_view(['GET'])
+def getWechat(request, id):
+    """
+    根据公众号id获取公众号的文章
+    :param request:
+    :return:
+    """
+    data = wechatCol.find_one({"_id": id})
+    return Response(data)
+
 class News(APIView):
     def get(self, request, format = None):
         data = db['news'].find_one({})
