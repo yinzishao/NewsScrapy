@@ -25,7 +25,7 @@ class YicaiSpider(scrapy.spiders.Spider):
     def __init__(self):
         self.display = Display(visible=0, size=(800, 600))  #为了隐藏浏览器
         self.display.start()
-        chromedriver = "/home/youmi/Downloads/chromedriver"
+        chromedriver = "/home/ubuntu/chromedriver"
         self.driver = webdriver.Chrome(chromedriver)                   #若无display，会打开浏览器
 
     def parse(self, response):
