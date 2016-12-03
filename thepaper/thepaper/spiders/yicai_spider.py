@@ -25,7 +25,8 @@ class YicaiSpider(scrapy.spiders.Spider):
     def __init__(self):
         self.display = Display(visible=0, size=(800, 600))  #为了隐藏浏览器
         self.display.start()
-        self.driver = webdriver.Firefox()                   #若无display，会打开浏览器
+        chromedriver = "/home/youmi/Downloads/chromedriver"
+        self.driver = webdriver.Chrome(chromedriver)                   #若无display，会打开浏览器
 
     def parse(self, response):
         topic_url = response.url
@@ -80,7 +81,7 @@ class YicaiSpider(scrapy.spiders.Spider):
         origin_date = soup.find("h2",class_="f-ff3 f-fwn").contents[-1].text if ff3 else None
         struct_date = datetime.datetime.strptime(origin_date,"%Y-%m-%d %H:%M")
         news_date = struct_date.strftime("%Y-%m-%d %H:%M:%S")
-        content = soup.find("div",class_="m-text").text if soup.find("div",class_="m-text") else None
+        content = soup.find("div",class_="m-text").text.strip() if soup.find("div",class_="m-text") else None
         author = soup.find("h3",class_="f-ff3 f-fwn").span.text if soup.find("h3",class_="f-ff3 f-fwn") else None
         crawl_date = NOW
         item["referer_web"]=referer_web
