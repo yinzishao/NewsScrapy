@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+import random
+
 __author__ = 'yinzishao'
 
 import re
@@ -18,11 +20,12 @@ class WechatSpider(scrapy.spiders.Spider):
     获取微信公众号的文章
     """
     name = "wechat"
-
+    download_delay = 1
     def start_requests(self):
-        for weixin_id in WECHAT_IDS[8:9]:
+        for weixin_id in WECHAT_IDS[7:8]:
             url = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=y&_sug_type_=" % weixin_id
             print url
+            time.sleep(random.randint(2,5))
             yield scrapy.Request(url, self.parse, meta= {"weixin_id":weixin_id})
     #TODO:BUG
     def parse(self, response):
@@ -30,6 +33,8 @@ class WechatSpider(scrapy.spiders.Spider):
         soup = BeautifulSoup(response.body,"lxml")
         url = soup.find("a",uigs="main_toweixin_account_image_0").get("href")   #获得公众号的主页
         name =  soup.find("a",uigs="main_toweixin_account_name_0").text.strip()
+        print url
+        time.sleep(random.randint(2,5))
         yield scrapy.Request(url, callback=self.parse_index, meta={"name":name, "weixin_id": weixin_id})
 
     def parse_index(self, response):
@@ -69,6 +74,8 @@ class WechatSpider(scrapy.spiders.Spider):
             )
             item = judge_news_crawl(item)
             if item:
+                time.sleep(random.randint(2,5))
+                print item['news_url']
                 yield scrapy.Request(item['news_url'],callback=self.parse_news, meta={"item": item})
             for c in u["app_msg_ext_info"]["multi_app_msg_item_list"]:
                 title = c["title"] #某天的文章的标题
@@ -94,6 +101,8 @@ class WechatSpider(scrapy.spiders.Spider):
                 )
                 item = judge_news_crawl(item)
                 if item:
+                    print item['news_url']
+                    time.sleep(random.randint(2,5))
                     yield scrapy.Request(item['news_url'],callback=self.parse_news, meta={"item": item})
 
     def parse_news(self, response):
