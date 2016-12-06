@@ -25,9 +25,10 @@ class YicaiSpider(scrapy.spiders.Spider):
     def __init__(self):
         self.display = Display(visible=0, size=(800, 600))  #为了隐藏浏览器
         self.display.start()
-        chromedriver = "/home/ubuntu/chromedriver"
-        self.driver = webdriver.Chrome(chromedriver)                   #若无display，会打开浏览器
-
+        # chromedriver = "/home/youmi/Downloads/chromedriver"
+        # self.driver = webdriver.Chrome(chromedriver)                   #若无display，会打开浏览器
+        chromedriver = "/home/ubuntu/geckodriver"
+        self.driver = webdriver.Firefox(executable_path=chromedriver)
     def parse(self, response):
         topic_url = response.url
         catalogue = u"商业" if "business" in topic_url else u"消费"

@@ -183,7 +183,8 @@ SPIDER_NAME = {
     "twc": "Travel weekly China",
     "meadin": "迈点网",
     "ctcnn": "劲旅网",
-    "wechat": "微信公众号"
+    "wechat": "微信公众号",
+    "baidunews": "百度新闻"
 }
 
 WECHAT_IDS = [

@@ -29,8 +29,10 @@ class YicaiSpider(scrapy.spiders.Spider):
     def __init__(self):
         self.display = Display(visible=0, size=(800, 600))  #为了隐藏浏览器
         self.display.start()
-        self.driver = webdriver.Firefox()                   #若无display，会打开浏览器
-
+        # self.chromedriver = "/home/youmi/Downloads/chromedriver"
+        # self.driver = webdriver.Chrome(self.chromedriver)              #若无display，会打开浏览器
+        chromedriver = "/home/ubuntu/geckodriver"
+        self.driver = webdriver.Firefox(executable_path=chromedriver)
     def parse(self, response):
         page = response.meta.get("page",1)
         origin_url = response.url
@@ -69,7 +71,8 @@ class YicaiSpider(scrapy.spiders.Spider):
         #     yield scrapy.Request(next_page,meta={"page":next_page})
 
     def parse_news(self,response):
-        driver = webdriver.Firefox()
+        # driver = webdriver.Chrome(self.chromedriver)
+        driver = webdriver.Firefox(executable_path=self.chromedriver)
         item = response.meta.get("item",NewsItem())
         page = response.meta.get("page",1)
         index = response.meta.get("index",0)
