@@ -3,6 +3,7 @@
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl carnoc -o log/carnoc.json --logfile log/carnoc.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl caacnews -o log/caacnews.json --logfile log/caacnews.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl mhyw -o log/mhyw.json --logfile log/mhyw.log
+0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl cntour2 -o log/cntour2.json --logfile log/cntour2.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl money163 -o log/money163.json --logfile log/money163.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl toptour -o log/toptour.json --logfile log/toptour.log
 0 8 * * *  cd {PROJECT_PATH}  && timeout 30m  scrapy crawl cnta -o log/cnta.json --logfile log/cnta.log
