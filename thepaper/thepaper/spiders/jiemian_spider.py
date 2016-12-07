@@ -30,7 +30,7 @@ class JiemianSpider(scrapy.spiders.Spider):
 
             catalogue = "左快讯"
             temp = soup.find("ul",class_ = "news-msg-list")
-            for news in temp.findall("div", class_ = "news-msg-item"):
+            for news in temp.find_all("div", class_ = "news-msg-item"):
                 news_date = "%s %s:00" % (time.strftime("%Y-%m-%d"),news.find("div",class_ = "news-date"))
                 title = news.find("a").text.strip()
                 news_url = news.find("a").get("href")
@@ -45,15 +45,15 @@ class JiemianSpider(scrapy.spiders.Spider):
 
             catalogue = "左新闻列表"
             temp = soup.find("div",class_ = "news-wrap" )
-            for news in temp.findall("div", class_ = "news-view"):
+            for news in temp.find_all("div", class_ = "news-view"):
                 pic = news.find("div",class_ = "news-img").find("img").get("src") if news.find("div",class_ = "news-img") else None
                 title = news.find("div",class_ = "news-header").find("a").text.strip()
                 news_url = news.find("div",class_ = "news-header").find("a").get("href")
                 news_no = news_url.rsplit("/",1)[-1].split(".")[0]
                 abstract = news.find("div",class_ = "news-main").text.strip()
-                author = news.find("span",class_ = "author").text.strip()
-                read_num = news.find("span",class_ = "collect").text.strip()
-                comment_num = news.find("span",class_ = "comment").text.strip()
+                author = news.find("span",class_ = "author").text.strip()    if news.find("span",class_ = "author") else None
+                read_num = news.find("span",class_ = "collect").text.strip() if news.find("span",class_ = "collect") else None
+                comment_num = news.find("span",class_ = "comment").text.strip() if news.find("span",class_ = "comment") else None
                 item = NewsItem(
                                 title=title,
                                 news_no = news_no,
@@ -69,7 +69,7 @@ class JiemianSpider(scrapy.spiders.Spider):
 
             catalogue = "左头条"
             temp = soup.find("div",class_ = "top-slider")
-            for news in temp.findall("div",class_ = "slider-page"):
+            for news in temp.find_all("div",class_ = "slider-page"):
                 news_url = news.find("div",class_ = "slider-header").find("a").get("href")
                 if "article" not in news_url:
                     continue
@@ -96,18 +96,19 @@ class JiemianSpider(scrapy.spiders.Spider):
             yield scrapy.Request(next_url)
         else:
             pageindex = origin_url.rsplit("&",1)[0].rsplit("=",1)[-1]
-            re_json = json.load(response.body)
+            text =  response.body.split("(",1)[-1][:-1]
+            re_json = json.loads(text)
             catalogue = "左新闻列表"
-            temp = BeautifulSoup(re_json[0]["rst"])
-            for news in temp.findall("div", class_ = "news-view"):
+            temp = BeautifulSoup(re_json[0]["rst"],"lxml")
+            for news in temp.find_all("div", class_ = "news-view"):
                 pic = news.find("div",class_ = "news-img").find("img").get("src") if news.find("div",class_ = "news-img") else None
                 title = news.find("div",class_ = "news-header").find("a").text.strip()
                 news_url = news.find("div",class_ = "news-header").find("a").get("href")
                 news_no = news_url.rsplit("/",1)[-1].split(".")[0]
-                abstract = news.find("div",class_ = "news-main").text.strip()
-                author = news.find("span",class_ = "author").text.strip()
-                read_num = news.find("span",class_ = "collect").text.strip()
-                comment_num = news.find("span",class_ = "comment").text.strip()
+                abstract = news.find("div",class_ = "news-main").text.strip() if news.find("span",class_ = "news-main") else None
+                author = news.find("span",class_ = "author").text.strip() if news.find("span",class_ = "author") else None
+                read_num = news.find("span",class_ = "collect").text.strip() if news.find("span",class_ = "collect") else None
+                comment_num = news.find("span",class_ = "comment").text.strip() if news.find("span",class_ = "comment") else None
                 item = NewsItem(
                                 title=title,
                                 news_no = news_no,
@@ -129,4 +130,20 @@ class JiemianSpider(scrapy.spiders.Spider):
     def parse_news(self,response):
         item = response.meta.get("item",NewsItem())
         soup = BeautifulSoup(response.body)
-        #
+        read_num = soup.find("a",title=u"浏览").text.strip() if soup.find("a",title=u"浏览") else None
+        comment_num  = soup.find("span", class_="comment_count").text.strip() if soup.find("span", class_="comment_count") else None
+        author = soup.find("span",class_="author").text.strip() if soup.find("span",class_="author") else None
+        news_date = soup.find("span", class_="date").text.strip().replace("/","-") + ":00"  if soup.find("span", class_="date") else None
+        pic = soup.find("div",class_= "article-img").find("img").get("src").strip() if soup.find("div",class_= "article-img") and soup.find("div",class_= "article-img").find("img") else None
+        temp = soup.find("div",class_="article-content")
+        content = "\n".join([ t.text.strip() for t in temp.find_all("p")])
+
+        item["read_num"] = read_num
+        item["author"] = author
+        item['comment_num'] = comment_num
+        item["news_date"] = news_date
+        item['pic'] = pic
+        item["content"] = content
+        item['crawl_date'] = NOW
+
+        yield item
