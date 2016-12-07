@@ -32,7 +32,7 @@ class Tech163Spider(scrapy.spiders.Spider):
             news_date = temp[-19:]
             if news_date:
                 referer_web = temp[:-19]
-                comment_num = news.find("a", class_ = "commentCount  ").text.strip()
+                comment_num = 0     #news.find("a", class_ = "commentCount  ").text.strip()   #评论条数需要用模拟器获取
                 temp = news.find("div",class_="titleBar clearfix").find("a")
                 news_url = temp.get("href")
                 title = temp.text.strip()
