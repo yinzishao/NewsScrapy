@@ -136,7 +136,7 @@ class JiemianSpider(scrapy.spiders.Spider):
         news_date = soup.find("span", class_="date").text.strip().replace("/","-") + ":00"  if soup.find("span", class_="date") else None
         pic = soup.find("div",class_= "article-img").find("img").get("src").strip() if soup.find("div",class_= "article-img") and soup.find("div",class_= "article-img").find("img") else None
         temp = soup.find("div",class_="article-content")
-        content = "\n".join([ t.text.strip() for t in temp.find_all("p")])
+        content = "\n".join([ t.text.strip() for t in temp.find_all("p")]) if temp.find("p") else None
 
         item["read_num"] = read_num
         item["author"] = author
