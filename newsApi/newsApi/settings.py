@@ -83,6 +83,15 @@ DATABASES = {
     }
 }
 
+#REST_FRAMEWORK
+#http://www.django-rest-framework.org/api-guide/renderers/#jsonp
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework_jsonp.renderers.JSONPRenderer',
+    ),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

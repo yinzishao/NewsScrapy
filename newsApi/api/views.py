@@ -7,9 +7,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import pymongo
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from rest_framework_jsonp.renderers import JSONPRenderer
 from bson.objectid import ObjectId
 from django.views.decorators.csrf import csrf_exempt
 client = pymongo.MongoClient(settings.MONGO_URI)
@@ -18,6 +20,7 @@ newsCol = db['news']    #新闻集合
 wechatCol = db['wechat'] #微信公众号集合
 
 @api_view(['GET'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def index(request):
     """
     首页
@@ -30,6 +33,7 @@ def index(request):
 
 
 @api_view(['GET', 'POST'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getSource(request):
     """
     获取新闻来源列表
@@ -58,6 +62,7 @@ def getSource(request):
     return Response(resultList)
 
 @api_view(['POSt'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getCatalogue(request):
     """
     获取某个新闻网站的类别列表
@@ -84,6 +89,7 @@ def getCatalogue(request):
 
 
 @api_view(['POST'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getNewsList(request):
     """
     根据新闻来源和新闻分类返回相对应的新闻列表
@@ -107,6 +113,7 @@ def getNewsList(request):
     return Response(resultList)
 
 @api_view(['GET'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getNews(request, id):
     """
     根据id获取新闻
@@ -118,6 +125,7 @@ def getNews(request, id):
     return Response(news)
 
 @api_view(['GET','POST'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getKeywords(request):
     """
     获取关键词
@@ -154,6 +162,7 @@ def getKeywords(request):
 
 
 @api_view(['GET','POST'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getNewsByKey(request):
     """
     根据传过去的关键词id返回该关键词下的新闻列表
@@ -177,6 +186,7 @@ def getNewsByKey(request):
 
 
 @api_view(['GET','POST'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getWechatSource(request):
     """
     获取公众号来源列表
@@ -205,6 +215,7 @@ def getWechatSource(request):
     return Response(resultList)
 
 @api_view(['POST'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getWechatList(request):
     """
     获取某个公众号的文章列表
@@ -224,6 +235,7 @@ def getWechatList(request):
     return Response(list(data))
 
 @api_view(['GET'])
+@renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getWechat(request, id):
     """
     根据公众号id获取公众号的文章
