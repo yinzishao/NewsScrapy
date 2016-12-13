@@ -52,16 +52,16 @@ def getSource(request):
     """
     pipeline = [{"$group": {"_id": "$source", "count": {"$sum": 1}}}]
     data = newsCol.aggregate(pipeline)
-    resultList = []
     if request.method == 'GET':
-        resultList = list(data)
+        size = int(request.GET.get('size', 6))
+        start = int(request.GET.get('start', 0))
     elif request.method == 'POST':
-        size = request.data['size']
-        start = request.data['start'] * size
-        resultList = list(data)[start : start + size]
+        size = int(request.data.get('size', 6))
+        start = int(request.data.get('start', 0)) * size
+    resultList = list(data)[start : start + size]
     return Response(resultList)
 
-@api_view(['POSt'])
+@api_view(['GET','POST'])
 @renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getCatalogue(request):
     """
@@ -73,7 +73,10 @@ def getCatalogue(request):
     :return:
 
     """
-    source = request.data['source']
+    if request.method == 'GET':
+        source = request.GET.get('source', None)
+    if request.method == 'POST':
+        source = request.data.get('source', None)
     pipeline = [{
         "$match":{
             'source': source
@@ -88,7 +91,7 @@ def getCatalogue(request):
     return Response(list(data))
 
 
-@api_view(['POST'])
+@api_view(['GET','POST'])
 @renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getNewsList(request):
     """
@@ -103,10 +106,16 @@ def getNewsList(request):
     :return:
         news items list
     """
-    source = request.data['source']
-    catalogue = request.data['catalogue']
-    size = request.data['size']
-    start = request.data['start'] * size
+    if request.method == 'GET':
+        size = int(request.GET.get('size', 6))
+        start = int(request.GET.get('start', 0))
+        source = request.GET.get('source', None)
+        catalogue = request.GET.get('catalogue', None)
+    if request.method == 'POST':
+        source = request.data.get('source', None)
+        catalogue = request.data.get('catalogue', None)
+        size = int(request.data.get('size', 6))
+        start = int(request.data.get('start', 0)) * size
     #获取新闻的简要信息
     data = newsCol.find({"source": source, "catalogue": catalogue}).skip(start).limit(size)
     resultList = list(data)
@@ -144,9 +153,13 @@ def getKeywords(request):
     """
     size = 6
     start = 0
+    if request.method == 'GET':
+        size = int(request.GET.get('size', 6))
+        start = int(request.GET.get('start', 0))
+
     if request.method == 'POST':
-        size = request.data['size']
-        start = request.data['start'] * size
+        size = int(request.data.get('size', 6))
+        start = int(request.data.get('start', 0)) * size
 
     pipeline = [{
         "$project": {"keywords": 1, "title": 1}
@@ -205,16 +218,18 @@ def getWechatSource(request):
     """
     pipeline = [{"$group": {"_id": "$weixin_name", "count": {"$sum": 1}}}]
     data = wechatCol.aggregate(pipeline)
-    resultList = []
     if request.method == 'GET':
-        resultList = list(data)
-    elif request.method == 'POST':
-        size = request.data['size']
-        start = request.data['start'] * size
-        resultList = list(data)[start : start + size]
+        size = int(request.GET.get('size', 6))
+        start = int(request.GET.get('start', 0))
+
+    if request.method == 'POST':
+        size = int(request.data.get('size', 6))
+        start = int(request.data.get('start', 0)) * size
+
+    resultList = list(data)[start : start + size]
     return Response(resultList)
 
-@api_view(['POST'])
+@api_view(['GET','POST'])
 @renderer_classes((BrowsableAPIRenderer, JSONRenderer,JSONPRenderer))
 def getWechatList(request):
     """
@@ -228,9 +243,15 @@ def getWechatList(request):
     :return:
         wechat items list
     """
-    size = request.data['size']
-    weixin_name = request.data['weixin_name']
-    start = request.data['start'] * size
+    if request.method == 'GET':
+        size = int(request.GET.get('size', 6))
+        start = int(request.GET.get('start', 0))
+        weixin_name = request.GET.get('weixin_name')
+
+    if request.method == 'POST':
+        size = int(request.data.get('size', 6))
+        start = int(request.data.get('start', 0)) * size
+        weixin_name = request.data.get('weixin_name')
     data = wechatCol.find({'weixin_name' : weixin_name}).skip(start).limit(size)
     return Response(list(data))
 
