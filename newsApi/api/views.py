@@ -190,10 +190,14 @@ def getNewsByKey(request):
     size = 6
     start = 0
     keyword = ""
+    if request.method == 'GET':
+        size = int(request.GET.get('size', 6))
+        start = int(request.GET.get('start', 0))
+        keyword = request.GET.get('_id', 0)
     if request.method == 'POST':
-        size = request.data['size']
-        start = request.data['start'] * size
-        keyword = request.data['_id']
+        size = int(request.data.get('size', 6))
+        start = int(request.data.get('start', 0)) * size
+        keyword = request.data.get('_id', "")
     resultList = list(newsCol.find({"keywords": keyword}))
     return Response(resultList[start : start + size])
 
