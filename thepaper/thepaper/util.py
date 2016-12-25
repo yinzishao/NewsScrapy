@@ -4,7 +4,7 @@ __author__ = 'yinzishao'
 
 import time
 import datetime
-from thepaper.settings import *
+from settings import *
 
 
 with open("keywords.txt") as f : keywords  = [ line.strip().split(" ")[0].decode("utf-8") for line in f.readlines()]
